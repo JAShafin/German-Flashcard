@@ -123,7 +123,7 @@ function loadWord() {
     front.innerText = word.german;
     back.innerHTML = `<p><strong>${word.german}</strong> = ${word.english}</p><img id="image" src="" alt="image">`;
 
-    speak(word.german, "de-DE");
+    speakInLanguage(word.german, "de-DE");
 
     fetch(`https://api.pexels.com/v1/search?query=${word.english}&per_page=1`, {
         headers: {
@@ -143,8 +143,9 @@ function loadWord() {
 function flipCard() {
     flashcard.classList.toggle("flipped");
     const word = words[currentIndex];
-    speak(word.german, "de-DE");
-    setTimeout(() => speak(`That means: ${word.english}`, "en-US"), 1000);
+    speakInLanguage(word.german, "de-DE", () => {
+        speakInLanguage(`That means: ${word.english}`, "en-US");
+    });
 }
 
 function markAsLearned() {
@@ -171,31 +172,30 @@ function nextWord() {
     loadWord();
 }
 
-function speak(text, lang) {
+// ✅ Split German & English with proper voices
+function speakInLanguage(text, lang, onEnd = null) {
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
 
     const voices = speechSynthesis.getVoices();
-    let selectedVoice = null;
-
-    if (lang === "de-DE") {
-        selectedVoice = voices.find(v => v.lang.startsWith("de"));
-    } else if (lang === "en-US") {
-        selectedVoice = voices.find(v => v.lang.startsWith("en"));
+    const voice = voices.find(v => v.lang.startsWith(lang));
+    if (voice) {
+        utterance.voice = voice;
     }
 
-    if (selectedVoice) {
-        utterance.voice = selectedVoice;
+    if (onEnd) {
+        utterance.onend = onEnd;
     }
 
     speechSynthesis.speak(utterance);
 }
 
-// iOS Safari: wait for voices to be ready
+// Load voices (iOS fix)
 if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = () => { };
 }
+
 
 
 
