@@ -181,13 +181,12 @@ function speakInLanguage(text, lang, onEnd = null) {
     utterance.lang = lang;
 
     const voices = speechSynthesis.getVoices();
-
     let voice = null;
+
     if (lang === "de-DE") {
-        // Try to use Google Deutsch specifically
-        voice = voices.find(v => v.name.includes("Google Deutsch")) || voices.find(v => v.lang === "de-DE");
+        voice = voices.find(v => v.name === "Anna") || voices.find(v => v.lang.startsWith("de"));
     } else if (lang === "en-US") {
-        voice = voices.find(v => v.name.includes("Google US English")) || voices.find(v => v.lang === "en-US");
+        voice = voices.find(v => v.lang.startsWith("en"));
     }
 
     if (voice) {
