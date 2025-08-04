@@ -9,8 +9,7 @@
 </head>
 
 <body>
-
-    <!-- ✅ Home Button (top-left) -->
+    <!-- ✅ Home Button -->
     <button id="home-button" onclick="goHome()" style="display: none;">Home</button>
 
     <div class="container">
@@ -24,7 +23,7 @@
             <button onclick="saveUserName()">Start</button>
         </div>
 
-        <!-- ✅ Group Selection Buttons -->
+        <!-- ✅ Group Buttons -->
         <div id="group-buttons" style="display: none;"></div>
 
         <!-- ✅ Credit -->
@@ -49,7 +48,33 @@
         </div>
     </div>
 
-    <!-- ✅ JavaScript -->
+    <!-- ✅ Firebase SDK (Module Import) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBNOE6uNXbm9fxPZ-fYG3w3ZVqkrKp3iYk",
+            authDomain: "flashcardapp-3c280.firebaseapp.com",
+            databaseURL: "https://flashcardapp-3c280-default-rtdb.firebaseio.com",
+            projectId: "flashcardapp-3c280",
+            storageBucket: "flashcardapp-3c280.appspot.com",
+            messagingSenderId: "101343349891",
+            appId: "1:101343349891:web:84957bc1382d0b3e0e5fb6",
+            measurementId: "G-REPMVTHX6C"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Global access to Firebase save function
+        window.saveUserToFirebase = function (userName) {
+            const usersRef = ref(db, 'users');
+            push(usersRef, { name: userName, timestamp: Date.now() });
+        };
+    </script>
+
+    <!-- ✅ Main App Script -->
     <script src="script.js"></script>
 </body>
 

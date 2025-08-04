@@ -23,6 +23,11 @@ function saveUserName() {
         title.style.display = "block";
         groupButtons.style.display = "flex";
         showGroupButtons();
+
+        // ✅ Save to Firebase
+        if (typeof saveUserToFirebase === "function") {
+            saveUserToFirebase(userName);
+        }
     }
 }
 
@@ -143,8 +148,6 @@ function loadWord() {
 function flipCard() {
     flashcard.classList.toggle("flipped");
     const word = words[currentIndex];
-
-    // Speak German word first, then English
     speakInLanguage(word.german, "de-DE", () => {
         speakInLanguage(`That means: ${word.english}`, "en-US");
     });
@@ -174,17 +177,15 @@ function nextWord() {
     loadWord();
 }
 
-// ✅ BEST QUALITY voice (e.g. “Anna” for German)
 function speakInLanguage(text, lang, onEnd = null) {
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
 
     const voices = speechSynthesis.getVoices();
-
     let voice = null;
+
     if (lang === "de-DE") {
-        // Try to use Google Deutsch specifically
         voice = voices.find(v => v.name.includes("Google Deutsch")) || voices.find(v => v.lang === "de-DE");
     } else if (lang === "en-US") {
         voice = voices.find(v => v.name.includes("Google US English")) || voices.find(v => v.lang === "en-US");
@@ -201,10 +202,10 @@ function speakInLanguage(text, lang, onEnd = null) {
     speechSynthesis.speak(utterance);
 }
 
-// iOS voice fix
 if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = () => { };
 }
+
 
 
 
