@@ -14,17 +14,11 @@ let currentIndex = 0;
 let learnedWords = [];
 let currentGroup = "";
 
-
 function saveUserName() {
     const input = document.getElementById("userNameInput").value.trim();
     if (input) {
         localStorage.setItem("userName", input);
         userName = input;
-
-        // ✅ Save to Firebase Realtime DB
-        const userRef = firebase.database().ref("users");
-        userRef.push({ name: input });
-
         namePrompt.style.display = "none";
         title.style.display = "block";
         groupButtons.style.display = "flex";
@@ -185,8 +179,8 @@ function speakInLanguage(text, lang, onEnd = null) {
     utterance.lang = lang;
 
     const voices = speechSynthesis.getVoices();
-    let voice = null;
 
+    let voice = null;
     if (lang === "de-DE") {
         voice = voices.find(v => v.name.includes("Google Deutsch")) || voices.find(v => v.lang === "de-DE");
     } else if (lang === "en-US") {
