@@ -143,6 +143,8 @@ function loadWord() {
 function flipCard() {
     flashcard.classList.toggle("flipped");
     const word = words[currentIndex];
+
+    // Speak German word first, then English
     speakInLanguage(word.german, "de-DE", () => {
         speakInLanguage(`That means: ${word.english}`, "en-US");
     });
@@ -172,14 +174,21 @@ function nextWord() {
     loadWord();
 }
 
-// ✅ Split German & English with proper voices
+// ✅ BEST QUALITY voice (e.g. “Anna” for German)
 function speakInLanguage(text, lang, onEnd = null) {
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
 
     const voices = speechSynthesis.getVoices();
-    const voice = voices.find(v => v.lang.startsWith(lang));
+    let voice = null;
+
+    if (lang === "de-DE") {
+        voice = voices.find(v => v.name === "Anna") || voices.find(v => v.lang.startsWith("de"));
+    } else if (lang === "en-US") {
+        voice = voices.find(v => v.lang.startsWith("en"));
+    }
+
     if (voice) {
         utterance.voice = voice;
     }
@@ -191,10 +200,11 @@ function speakInLanguage(text, lang, onEnd = null) {
     speechSynthesis.speak(utterance);
 }
 
-// Load voices (iOS fix)
+// iOS voice fix
 if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = () => { };
 }
+
 
 
 
