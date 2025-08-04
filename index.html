@@ -10,7 +10,6 @@
 
 <body>
 
-    <!-- ✅ Home Button -->
     <button id="home-button" onclick="goHome()" style="display: none;">Home</button>
 
     <div class="container">
@@ -44,8 +43,8 @@
     </div>
 
     <!-- ✅ Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
     <!-- ✅ Firebase Config -->
     <script>
@@ -60,17 +59,12 @@
             measurementId: "G-REPMVTHX6C"
         };
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        // Make Firebase available globally
-        window.firebaseDB = db;
-        window.firebasePush = firebase.database().ref;
-        window.firebaseRef = firebase.database().ref;
+        // ✅ Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        window.firebaseDB = firebase.database();
     </script>
 
-    <!-- ✅ Your main app logic -->
+    <!-- ✅ Your app logic -->
     <script src="script.js"></script>
 </body>
 

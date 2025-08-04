@@ -9,12 +9,11 @@ const buttons = document.getElementById("buttons");
 const title = document.getElementById("title");
 const homeButton = document.getElementById("home-button");
 
-
-
 let words = [];
 let currentIndex = 0;
 let learnedWords = [];
 let currentGroup = "";
+
 
 function saveUserName() {
     const input = document.getElementById("userNameInput").value.trim();
@@ -22,9 +21,9 @@ function saveUserName() {
         localStorage.setItem("userName", input);
         userName = input;
 
-        // ✅ Save to Firebase
-        const userRef = window.firebaseRef(window.firebaseDB, "users");
-        window.firebasePush(userRef, { name: input });
+        // ✅ Save to Firebase Realtime DB
+        const userRef = firebase.database().ref("users");
+        userRef.push({ name: input });
 
         namePrompt.style.display = "none";
         title.style.display = "block";
@@ -150,6 +149,7 @@ function loadWord() {
 function flipCard() {
     flashcard.classList.toggle("flipped");
     const word = words[currentIndex];
+
     speakInLanguage(word.german, "de-DE", () => {
         speakInLanguage(`That means: ${word.english}`, "en-US");
     });
@@ -207,6 +207,7 @@ function speakInLanguage(text, lang, onEnd = null) {
 if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = () => { };
 }
+
 
 
 
