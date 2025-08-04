@@ -176,8 +176,24 @@ function speak(text) {
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "de-DE";
+
+    const voices = speechSynthesis.getVoices();
+    const germanVoices = voices.filter(voice => voice.lang.startsWith("de"));
+
+    if (germanVoices.length > 0) {
+        utterance.voice = germanVoices[0]; // force German voice
+    }
+
     speechSynthesis.speak(utterance);
 }
+
+// iOS fix: wait for voices to load
+if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = () => {
+        console.log("Voices loaded.");
+    };
+}
+
 
 
 
