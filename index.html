@@ -6,10 +6,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>German Vocabulary Flashcards</title>
     <link rel="stylesheet" href="style.css" />
+
+    <!-- ✅ Firebase SDKs -->
+    <script type="module">
+        // Firebase App (the core Firebase SDK)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        // ✅ Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBNOE6uNXbm9fxPZ-fYG3w3ZVqkrKp3iYk",
+            authDomain: "flashcardapp-3c280.firebaseapp.com",
+            databaseURL: "https://flashcardapp-3c280-default-rtdb.firebaseio.com",
+            projectId: "flashcardapp-3c280",
+            storageBucket: "flashcardapp-3c280.appspot.com",
+            messagingSenderId: "101343349891",
+            appId: "1:101343349891:web:84957bc1382d0b3e0e5fb6",
+            measurementId: "G-REPMVTHX6C"
+        };
+
+        // ✅ Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getDatabase(app);
+        window.firebaseDB = db;
+        window.firebaseRef = ref;
+        window.firebasePush = push;
+    </script>
 </head>
 
 <body>
-
     <!-- ✅ Home Button (top-left) -->
     <button id="home-button" onclick="goHome()" style="display: none;">Home</button>
 
@@ -49,8 +76,8 @@
         </div>
     </div>
 
-    <!-- ✅ JavaScript -->
-    <script src="script.js"></script>
+    <!-- ✅ Your App Logic -->
+    <script type="module" src="script.js"></script>
 </body>
 
 </html>

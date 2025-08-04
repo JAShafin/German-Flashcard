@@ -1,3 +1,22 @@
+// ✅ Firebase Setup
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBNOE6uNXbm9fxPZ-fYG3w3ZVqkrKp3iYk",
+    authDomain: "flashcardapp-3c280.firebaseapp.com",
+    databaseURL: "https://flashcardapp-3c280-default-rtdb.firebaseio.com",
+    projectId: "flashcardapp-3c280",
+    storageBucket: "flashcardapp-3c280.appspot.com",
+    messagingSenderId: "101343349891",
+    appId: "1:101343349891:web:84957bc1382d0b3e0e5fb6",
+    measurementId: "G-REPMVTHX6C"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// ✅ DOM Elements
 let userName;
 const namePrompt = document.getElementById("namePrompt");
 const groupButtons = document.getElementById("group-buttons");
@@ -14,11 +33,18 @@ let currentIndex = 0;
 let learnedWords = [];
 let currentGroup = "";
 
+// ✅ Save User
 function saveUserName() {
     const input = document.getElementById("userNameInput").value.trim();
     if (input) {
         localStorage.setItem("userName", input);
         userName = input;
+
+        // Save to Firebase
+        set(ref(db, "users/" + userName), {
+            name: userName
+        });
+
         namePrompt.style.display = "none";
         title.style.display = "block";
         groupButtons.style.display = "flex";
@@ -26,6 +52,7 @@ function saveUserName() {
     }
 }
 
+// ✅ Page Load
 window.onload = function () {
     userName = localStorage.getItem("userName");
     flashcard.style.display = "none";
@@ -43,6 +70,7 @@ window.onload = function () {
     }
 };
 
+// ✅ Show Group Buttons (progress logic)
 function showGroupButtons() {
     groupButtons.innerHTML = "";
     groupButtons.style.display = "flex";
@@ -92,6 +120,7 @@ function showGroupButtons() {
     });
 }
 
+// ✅ Flashcard Logic
 function startFlashcards(selectedGroup) {
     words = wordGroups[selectedGroup];
     currentGroup = selectedGroup;
@@ -144,7 +173,6 @@ function flipCard() {
     flashcard.classList.toggle("flipped");
     const word = words[currentIndex];
 
-    // Speak German word first, then English
     speakInLanguage(word.german, "de-DE", () => {
         speakInLanguage(`That means: ${word.english}`, "en-US");
     });
@@ -174,17 +202,16 @@ function nextWord() {
     loadWord();
 }
 
-// ✅ BEST QUALITY voice (e.g. “Anna” for German)
+// ✅ Text-to-Speech
 function speakInLanguage(text, lang, onEnd = null) {
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
 
     const voices = speechSynthesis.getVoices();
-
     let voice = null;
+
     if (lang === "de-DE") {
-        // Try to use Google Deutsch specifically
         voice = voices.find(v => v.name.includes("Google Deutsch")) || voices.find(v => v.lang === "de-DE");
     } else if (lang === "en-US") {
         voice = voices.find(v => v.name.includes("Google US English")) || voices.find(v => v.lang === "en-US");
@@ -201,7 +228,7 @@ function speakInLanguage(text, lang, onEnd = null) {
     speechSynthesis.speak(utterance);
 }
 
-// iOS voice fix
+// ✅ Fix for iOS
 if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = () => { };
 }
