@@ -1,22 +1,3 @@
-// Firebase setup
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyBNOE6uNXbm9fxPZ-fYG3w3ZVqkrKp3iYk",
-    authDomain: "flashcardapp-3c280.firebaseapp.com",
-    databaseURL: "https://flashcardapp-3c280-default-rtdb.firebaseio.com",
-    projectId: "flashcardapp-3c280",
-    storageBucket: "flashcardapp-3c280.appspot.com",
-    messagingSenderId: "101343349891",
-    appId: "1:101343349891:web:84957bc1382d0b3e0e5fb6",
-    measurementId: "G-REPMVTHX6C"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-// App UI
 let userName;
 const namePrompt = document.getElementById("namePrompt");
 const groupButtons = document.getElementById("group-buttons");
@@ -33,7 +14,6 @@ let currentIndex = 0;
 let learnedWords = [];
 let currentGroup = "";
 
-// Save name + upload to Firebase
 function saveUserName() {
     const input = document.getElementById("userNameInput").value.trim();
     if (input) {
@@ -43,11 +23,6 @@ function saveUserName() {
         title.style.display = "block";
         groupButtons.style.display = "flex";
         showGroupButtons();
-
-        // Save to Firebase Realtime Database
-        set(ref(db, 'users/' + userName), {
-            createdAt: new Date().toISOString()
-        });
     }
 }
 
@@ -168,6 +143,8 @@ function loadWord() {
 function flipCard() {
     flashcard.classList.toggle("flipped");
     const word = words[currentIndex];
+
+    // Speak German word first, then English
     speakInLanguage(word.german, "de-DE", () => {
         speakInLanguage(`That means: ${word.english}`, "en-US");
     });
@@ -197,7 +174,7 @@ function nextWord() {
     loadWord();
 }
 
-// ✅ BEST QUALITY voice (Google)
+// ✅ BEST QUALITY voice (e.g. “Anna” for German)
 function speakInLanguage(text, lang, onEnd = null) {
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
@@ -207,6 +184,7 @@ function speakInLanguage(text, lang, onEnd = null) {
 
     let voice = null;
     if (lang === "de-DE") {
+        // Try to use Google Deutsch specifically
         voice = voices.find(v => v.name.includes("Google Deutsch")) || voices.find(v => v.lang === "de-DE");
     } else if (lang === "en-US") {
         voice = voices.find(v => v.name.includes("Google US English")) || voices.find(v => v.lang === "en-US");
