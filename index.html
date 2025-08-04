@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>German Vocabulary Flashcards</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <!-- ✅ Home Button (top-left) -->
+    <button id="home-button" onclick="goHome()" style="display: none;">Home</button>
+
+    <div class="container">
+        <!-- ✅ Title -->
+        <h2 id="title">German Vocabulary Flashcards</h2>
+
+        <!-- ✅ Name Prompt -->
+        <div id="namePrompt" class="name-box">
+            <p>Please enter your name:</p>
+            <input type="text" id="userNameInput" />
+            <button onclick="saveUserName()">Start</button>
+        </div>
+
+        <!-- ✅ Group Selection Buttons -->
+        <div id="group-buttons" style="display: none;"></div>
+
+        <!-- ✅ Credit -->
+        <p class="credit">developed by Shaf 🤙</p>
+
+        <!-- ✅ Flashcard -->
+        <div id="flashcard-container">
+            <div class="flashcard" id="flashcard" style="display: none;">
+                <div class="front" id="card-front">Word</div>
+                <div class="back" id="card-back">
+                    <p><strong>Word</strong> = Meaning</p>
+                    <img id="image" src="" alt="word image" />
+                </div>
+            </div>
+        </div>
+
+        <!-- ✅ Action Buttons -->
+        <div class="buttons" id="buttons" style="display: none;">
+            <button onclick="flipCard()">Flip</button>
+            <button onclick="markAsLearned()">Learned</button>
+            <button onclick="nextWord()">Practice</button>
+        </div>
+    </div>
+
+    <!-- ✅ JavaScript -->
+    <script src="script.js"></script>
+</body>
+
+</html>
