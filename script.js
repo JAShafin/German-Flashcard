@@ -14,7 +14,6 @@ let currentIndex = 0;
 let learnedWords = [];
 let currentGroup = "";
 
-// ✅ FIXED: Save username & go to category screen
 function saveUserName() {
     const input = document.getElementById("userNameInput").value.trim();
     if (input) {
@@ -27,7 +26,6 @@ function saveUserName() {
     }
 }
 
-// ✅ FIXED: Load everything correctly on refresh
 window.onload = function () {
     userName = localStorage.getItem("userName");
     flashcard.style.display = "none";
@@ -125,7 +123,7 @@ function loadWord() {
     front.innerText = word.german;
     back.innerHTML = `<p><strong>${word.german}</strong> = ${word.english}</p><img id="image" src="" alt="image">`;
 
-    speak(word.german);
+    speak(word.german, "de-DE");
 
     fetch(`https://api.pexels.com/v1/search?query=${word.english}&per_page=1`, {
         headers: {
@@ -145,7 +143,8 @@ function loadWord() {
 function flipCard() {
     flashcard.classList.toggle("flipped");
     const word = words[currentIndex];
-    speak(`${word.german}. That means: ${word.english}`);
+    speak(word.german, "de-DE");
+    setTimeout(() => speak(`That means: ${word.english}`, "en-US"), 1000);
 }
 
 function markAsLearned() {
@@ -172,26 +171,30 @@ function nextWord() {
     loadWord();
 }
 
-function speak(text) {
+function speak(text, lang) {
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "de-DE";
+    utterance.lang = lang;
 
     const voices = speechSynthesis.getVoices();
-    const germanVoices = voices.filter(voice => voice.lang.startsWith("de"));
+    let selectedVoice = null;
 
-    if (germanVoices.length > 0) {
-        utterance.voice = germanVoices[0]; // force German voice
+    if (lang === "de-DE") {
+        selectedVoice = voices.find(v => v.lang.startsWith("de"));
+    } else if (lang === "en-US") {
+        selectedVoice = voices.find(v => v.lang.startsWith("en"));
+    }
+
+    if (selectedVoice) {
+        utterance.voice = selectedVoice;
     }
 
     speechSynthesis.speak(utterance);
 }
 
-// iOS fix: wait for voices to load
-if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = () => {
-        console.log("Voices loaded.");
-    };
+// iOS Safari: wait for voices to be ready
+if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = () => { };
 }
 
 
