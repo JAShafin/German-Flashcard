@@ -1,3 +1,21 @@
+// Initialize Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyBNOE6uNXbm9fxPZ-fYG3w3ZVqkrKp3iYk",
+    authDomain: "flashcardapp-3c280.firebaseapp.com",
+    databaseURL: "https://flashcardapp-3c280-default-rtdb.firebaseio.com",
+    projectId: "flashcardapp-3c280",
+    storageBucket: "flashcardapp-3c280.firebasestorage.app",
+    messagingSenderId: "101343349891",
+    appId: "1:101343349891:web:84957bc1382d0b3e0e5fb6",
+    measurementId: "G-REPMVTHX6C"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+
+
+
+
 let userName;
 const namePrompt = document.getElementById("namePrompt");
 const groupButtons = document.getElementById("group-buttons");
@@ -19,12 +37,16 @@ function saveUserName() {
     if (input) {
         localStorage.setItem("userName", input);
         userName = input;
+        // Save the username to Firebase
+        db.ref("users").push({ name: input, timestamp: Date.now() });
+
         namePrompt.style.display = "none";
         title.style.display = "block";
         groupButtons.style.display = "flex";
         showGroupButtons();
     }
 }
+
 
 window.onload = function () {
     userName = localStorage.getItem("userName");
