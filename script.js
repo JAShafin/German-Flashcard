@@ -178,14 +178,32 @@ function speakInLanguage(text, lang, onEnd = null) {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
 
-    const voices = speechSynthesis.getVoices();
+    // Try to get available voices
+    let voices = speechSynthesis.getVoices();
+
+    // On iPhone and Safari, voices may not be ready immediately
+    if (!voices.length) {
+        speechSynthesis.onvoiceschanged = () => {
+            speakInLanguage(text, lang, onEnd); // Retry once voices are loaded
+        };
+        return;
+    }
 
     let voice = null;
     if (lang === "de-DE") {
-        // Try to use Google Deutsch specifically
-        voice = voices.find(v => v.name.includes("Google Deutsch")) || voices.find(v => v.lang === "de-DE");
+        // Try best German voice: "Google Deutsch", "Anna", etc.
+        voice =
+            voices.find(v => v.name.includes("Google Deutsch")) ||
+            voices.find(v => v.name.includes("Anna")) ||
+            voices.find(v => v.lang === "de-DE") ||
+            voices.find(v => v.lang.startsWith("de"));
     } else if (lang === "en-US") {
-        voice = voices.find(v => v.name.includes("Google US English")) || voices.find(v => v.lang === "en-US");
+        // Try best English voice: "Google US English", "Samantha", etc.
+        voice =
+            voices.find(v => v.name.includes("Google US English")) ||
+            voices.find(v => v.name.includes("Samantha")) ||
+            voices.find(v => v.lang === "en-US") ||
+            voices.find(v => v.lang.startsWith("en"));
     }
 
     if (voice) {
@@ -198,6 +216,7 @@ function speakInLanguage(text, lang, onEnd = null) {
 
     speechSynthesis.speak(utterance);
 }
+
 
 
 // Load voices (iOS fix)
