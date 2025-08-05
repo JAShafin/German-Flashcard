@@ -14,7 +14,6 @@ let currentIndex = 0;
 let learnedWords = [];
 let currentGroup = "";
 
-// ✅ FIXED: Save username & go to category screen
 function saveUserName() {
     const input = document.getElementById("userNameInput").value.trim();
     if (input) {
@@ -27,7 +26,6 @@ function saveUserName() {
     }
 }
 
-// ✅ FIXED: Load everything correctly on refresh
 window.onload = function () {
     userName = localStorage.getItem("userName");
     flashcard.style.display = "none";
@@ -125,7 +123,7 @@ function loadWord() {
     front.innerText = word.german;
     back.innerHTML = `<p><strong>${word.german}</strong> = ${word.english}</p><img id="image" src="" alt="image">`;
 
-    speak(word.german);
+    speakInLanguage(word.german, "de-DE");
 
     fetch(`https://api.pexels.com/v1/search?query=${word.english}&per_page=1`, {
         headers: {
@@ -145,7 +143,9 @@ function loadWord() {
 function flipCard() {
     flashcard.classList.toggle("flipped");
     const word = words[currentIndex];
-    speak(`${word.german}. That means: ${word.english}`);
+    speakInLanguage(word.german, "de-DE", () => {
+        speakInLanguage(`That means: ${word.english}`, "en-US");
+    });
 }
 
 function markAsLearned() {
@@ -172,11 +172,28 @@ function nextWord() {
     loadWord();
 }
 
-function speak(text) {
+// ✅ Split German & English with proper voices
+function speakInLanguage(text, lang, onEnd = null) {
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "de-DE";
+    utterance.lang = lang;
+
+    const voices = speechSynthesis.getVoices();
+    const voice = voices.find(v => v.lang.startsWith(lang));
+    if (voice) {
+        utterance.voice = voice;
+    }
+
+    if (onEnd) {
+        utterance.onend = onEnd;
+    }
+
     speechSynthesis.speak(utterance);
+}
+
+// Load voices (iOS fix)
+if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = () => { };
 }
 
 
