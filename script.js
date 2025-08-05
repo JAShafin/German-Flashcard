@@ -179,7 +179,15 @@ function speakInLanguage(text, lang, onEnd = null) {
     utterance.lang = lang;
 
     const voices = speechSynthesis.getVoices();
-    const voice = voices.find(v => v.lang.startsWith(lang));
+
+    let voice = null;
+    if (lang === "de-DE") {
+        // Try to use Google Deutsch specifically
+        voice = voices.find(v => v.name.includes("Google Deutsch")) || voices.find(v => v.lang === "de-DE");
+    } else if (lang === "en-US") {
+        voice = voices.find(v => v.name.includes("Google US English")) || voices.find(v => v.lang === "en-US");
+    }
+
     if (voice) {
         utterance.voice = voice;
     }
@@ -190,6 +198,7 @@ function speakInLanguage(text, lang, onEnd = null) {
 
     speechSynthesis.speak(utterance);
 }
+
 
 // Load voices (iOS fix)
 if (speechSynthesis.onvoiceschanged !== undefined) {
