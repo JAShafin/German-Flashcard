@@ -14,6 +14,7 @@ let currentIndex = 0;
 let learnedWords = [];
 let currentGroup = "";
 
+// ✅ FIXED: Save username & go to category screen
 function saveUserName() {
     const input = document.getElementById("userNameInput").value.trim();
     if (input) {
@@ -26,6 +27,7 @@ function saveUserName() {
     }
 }
 
+// ✅ FIXED: Load everything correctly on refresh
 window.onload = function () {
     userName = localStorage.getItem("userName");
     flashcard.style.display = "none";
@@ -123,7 +125,7 @@ function loadWord() {
     front.innerText = word.german;
     back.innerHTML = `<p><strong>${word.german}</strong> = ${word.english}</p><img id="image" src="" alt="image">`;
 
-    speakInLanguage(word.german, "de-DE");
+    speak(word.german);
 
     fetch(`https://api.pexels.com/v1/search?query=${word.english}&per_page=1`, {
         headers: {
@@ -143,11 +145,7 @@ function loadWord() {
 function flipCard() {
     flashcard.classList.toggle("flipped");
     const word = words[currentIndex];
-
-    // Speak German word first, then English
-    speakInLanguage(word.german, "de-DE", () => {
-        speakInLanguage(`That means: ${word.english}`, "en-US");
-    });
+    speak(`${word.german}. That means: ${word.english}`);
 }
 
 function markAsLearned() {
@@ -174,38 +172,14 @@ function nextWord() {
     loadWord();
 }
 
-// ✅ BEST QUALITY voice (e.g. “Anna” for German)
-function speakInLanguage(text, lang, onEnd = null) {
+function speak(text) {
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang;
-
-    const voices = speechSynthesis.getVoices();
-
-    let voice = null;
-    if (lang === "de-DE") {
-        // Try to use Google Deutsch specifically
-        voice = voices.find(v => v.name.includes("Google Deutsch")) || voices.find(v => v.lang === "de-DE");
-    } else if (lang === "en-US") {
-        voice = voices.find(v => v.name.includes("Google US English")) || voices.find(v => v.lang === "en-US");
-    }
-
-    if (voice) {
-        utterance.voice = voice;
-    }
-
-    if (onEnd) {
-        utterance.onend = onEnd;
-    }
-
+    utterance.lang = "de-DE";
     speechSynthesis.speak(utterance);
 }
 
 
-// iOS voice fix
-if (speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = () => { };
-}
 
 
 
