@@ -1,33 +1,3 @@
-// ✅ Firebase Setup
-import { initializeApp } from "firebase/app";
-import { getDatabase, ref, push, set, serverTimestamp } from "firebase/database";
-
-// ✅ Firebase Configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyBNOE6uNXbm9fxPZ-fYG3w3ZVqkrKp3iYk",
-    authDomain: "flashcardapp-3c280.firebaseapp.com",
-    databaseURL: "https://flashcardapp-3c280-default-rtdb.firebaseio.com",
-    projectId: "flashcardapp-3c280",
-    storageBucket: "flashcardapp-3c280.appspot.com",
-    messagingSenderId: "101343349891",
-    appId: "1:101343349891:web:84957bc1382d0b3e0e5fb6",
-    measurementId: "G-REPMVTHX6C"
-};
-
-// ✅ Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
-
-// ✅ Function to save user to Firebase
-function saveUserNameToFirebase(name) {
-    const userRef = ref(database, "users");
-    push(userRef, {
-        name: name,
-        timestamp: serverTimestamp()
-    });
-}
-
-// ✅ Main App Logic
 let userName;
 const namePrompt = document.getElementById("namePrompt");
 const groupButtons = document.getElementById("group-buttons");
@@ -49,7 +19,6 @@ function saveUserName() {
     if (input) {
         localStorage.setItem("userName", input);
         userName = input;
-        saveUserNameToFirebase(userName); // ✅ Save to Firebase
         namePrompt.style.display = "none";
         title.style.display = "block";
         groupButtons.style.display = "flex";
@@ -73,6 +42,170 @@ window.onload = function () {
         groupButtons.style.display = "none";
     }
 };
+
+function showGroupButtons() {
+    groupButtons.innerHTML = "";
+    groupButtons.style.display = "flex";
+
+    Object.keys(wordGroups).forEach(group => {
+        const learned = JSON.parse(localStorage.getItem(group)) || [];
+        const total = wordGroups[group].length;
+        const progress = learned.length;
+
+        let label = group;
+        if (progress === total && total > 0) {
+            label += " ✅";
+        } else if (progress > 0) {
+            const percent = Math.floor((progress / total) * 100);
+            label += ` (${percent}%)`;
+        }
+
+        const button = document.createElement("button");
+        button.innerText = label;
+        button.onclick = () => startFlashcards(group);
+
+        const resetButton = document.createElement("button");
+        resetButton.innerHTML = "🔁";
+        resetButton.title = "Reset progress";
+        resetButton.style.border = "none";
+        resetButton.style.background = "transparent";
+        resetButton.style.cursor = "pointer";
+        resetButton.style.fontSize = "18px";
+        resetButton.style.marginLeft = "auto";
+
+        resetButton.onclick = () => {
+            localStorage.removeItem(group);
+            showGroupButtons();
+        };
+
+        const wrapper = document.createElement("div");
+        wrapper.style.display = "flex";
+        wrapper.style.justifyContent = "space-between";
+        wrapper.style.alignItems = "center";
+        wrapper.style.gap = "10px";
+        wrapper.style.marginBottom = "10px";
+        wrapper.style.width = "300px";
+
+        wrapper.appendChild(button);
+        wrapper.appendChild(resetButton);
+        groupButtons.appendChild(wrapper);
+    });
+}
+
+function startFlashcards(selectedGroup) {
+    words = wordGroups[selectedGroup];
+    currentGroup = selectedGroup;
+    currentIndex = 0;
+    learnedWords = JSON.parse(localStorage.getItem(currentGroup)) || [];
+
+    flashcard.style.display = "block";
+    buttons.style.display = "block";
+    groupButtons.style.display = "none";
+    title.style.display = "none";
+    homeButton.style.display = "block";
+
+    loadWord();
+}
+
+function loadWord() {
+    while (learnedWords.includes(currentIndex) && currentIndex < words.length) {
+        currentIndex++;
+    }
+
+    if (currentIndex >= words.length || words.length === 0) {
+        front.innerText = "🎉 All done!";
+        back.innerHTML = "";
+        image.src = "";
+        return;
+    }
+
+    const word = words[currentIndex];
+    front.innerText = word.german;
+    back.innerHTML = `<p><strong>${word.german}</strong> = ${word.english}</p><img id="image" src="" alt="image">`;
+
+    speakInLanguage(word.german, "de-DE");
+
+    fetch(`https://api.pexels.com/v1/search?query=${word.english}&per_page=1`, {
+        headers: {
+            Authorization: 'bXRrCdI0rYHuzI8RossKeXHIryc6Hupp2wVMEyuDFXOsyRJiB5c8BMlp'
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.photos && data.photos.length > 0) {
+                document.getElementById("image").src = data.photos[0].src.medium;
+            } else {
+                document.getElementById("image").alt = "No image found";
+            }
+        });
+}
+
+function flipCard() {
+    flashcard.classList.toggle("flipped");
+    const word = words[currentIndex];
+
+    // Speak German word first, then English
+    speakInLanguage(word.german, "de-DE", () => {
+        speakInLanguage(`That means: ${word.english}`, "en-US");
+    });
+}
+
+function markAsLearned() {
+    if (!learnedWords.includes(currentIndex)) {
+        learnedWords.push(currentIndex);
+        localStorage.setItem(currentGroup, JSON.stringify(learnedWords));
+    }
+    currentIndex++;
+    flashcard.classList.remove("flipped");
+    loadWord();
+}
+
+function goHome() {
+    flashcard.style.display = "none";
+    buttons.style.display = "none";
+    title.style.display = "block";
+    homeButton.style.display = "none";
+    showGroupButtons();
+}
+
+function nextWord() {
+    currentIndex++;
+    flashcard.classList.remove("flipped");
+    loadWord();
+}
+
+// ✅ BEST QUALITY voice (e.g. “Anna” for German)
+function speakInLanguage(text, lang, onEnd = null) {
+    speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang;
+
+    const voices = speechSynthesis.getVoices();
+
+    let voice = null;
+    if (lang === "de-DE") {
+        // Try to use Google Deutsch specifically
+        voice = voices.find(v => v.name.includes("Google Deutsch")) || voices.find(v => v.lang === "de-DE");
+    } else if (lang === "en-US") {
+        voice = voices.find(v => v.name.includes("Google US English")) || voices.find(v => v.lang === "en-US");
+    }
+
+    if (voice) {
+        utterance.voice = voice;
+    }
+
+    if (onEnd) {
+        utterance.onend = onEnd;
+    }
+
+    speechSynthesis.speak(utterance);
+}
+
+
+// iOS voice fix
+if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = () => { };
+}
 
 
 
