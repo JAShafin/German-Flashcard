@@ -10,7 +10,7 @@
 
 <body>
 
-    <!-- ✅ Home Button (top-left) -->
+    <!-- ✅ Home Button -->
     <button id="home-button" onclick="goHome()" style="display: none;">Home</button>
 
     <div class="container">
@@ -24,13 +24,10 @@
             <button onclick="saveUserName()">Start</button>
         </div>
 
-        <!-- ✅ Group Selection Buttons -->
+        <!-- ✅ Group Buttons -->
         <div id="group-buttons" style="display: none;"></div>
 
-        <!-- ✅ Credit -->
-        <p class="credit">developed by Shaf 🤙</p>
-
-        <!-- ✅ Flashcard -->
+        <!-- ✅ Flashcard Area -->
         <div id="flashcard-container">
             <div class="flashcard" id="flashcard" style="display: none;">
                 <div class="front" id="card-front">Word</div>
@@ -47,10 +44,14 @@
             <button onclick="markAsLearned()">Learned</button>
             <button onclick="nextWord()">Practice</button>
         </div>
+
+        <!-- ✅ Credit -->
+        <p class="credit">developed by Shaf 🤙</p>
     </div>
 
-    <!-- ✅ JavaScript -->
+    <!-- ✅ Script -->
     <script src="script.js"></script>
+
 </body>
 
 </html>

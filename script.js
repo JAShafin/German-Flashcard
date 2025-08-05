@@ -144,7 +144,7 @@ function flipCard() {
     flashcard.classList.toggle("flipped");
     const word = words[currentIndex];
 
-    // Speak German then English
+    // Speak German word first, then English
     speakInLanguage(word.german, "de-DE", () => {
         speakInLanguage(`That means: ${word.english}`, "en-US");
     });
@@ -174,7 +174,7 @@ function nextWord() {
     loadWord();
 }
 
-// ✅ Speak using BEST voice match (Google preferred)
+// ✅ BEST QUALITY voice (e.g. “Anna” for German)
 function speakInLanguage(text, lang, onEnd = null) {
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
@@ -184,6 +184,7 @@ function speakInLanguage(text, lang, onEnd = null) {
 
     let voice = null;
     if (lang === "de-DE") {
+        // Try to use Google Deutsch specifically
         voice = voices.find(v => v.name.includes("Google Deutsch")) || voices.find(v => v.lang === "de-DE");
     } else if (lang === "en-US") {
         voice = voices.find(v => v.name.includes("Google US English")) || voices.find(v => v.lang === "en-US");
@@ -200,10 +201,12 @@ function speakInLanguage(text, lang, onEnd = null) {
     speechSynthesis.speak(utterance);
 }
 
-// Fix for iOS and others: wait for voices to load
+
+// iOS voice fix
 if (speechSynthesis.onvoiceschanged !== undefined) {
     speechSynthesis.onvoiceschanged = () => { };
 }
+
 
 
 
