@@ -6,38 +6,40 @@ Follow these steps to enable the AI chat feature on your German Flashcard app us
 
 ## Prerequisites
 
-- Node.js 18 or later installed
-- Firebase CLI installed (`npm install -g firebase-tools`)
-- Your Firebase project: `flashcardapp-3c280`
+- Node.js 18 or later installed on your computer
+- Firebase CLI installed — run once: `npm install -g firebase-tools`
+- The `.firebaserc` file in this repo already points to your project (`flashcardapp-3c280`), so no extra setup needed
 
 ---
 
 ## Step 1 – Get a Free Gemini API Key
 
 1. Go to **[https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)**
-2. Sign in with your Google account
+2. Sign in with your Google account (the same one you use for Firebase)
 3. Click **"Get API key"** → **"Create API key in new project"**
-4. Copy the generated key — you'll need it later
+4. Copy the generated key — you'll need it in Step 5
 
-> The free tier allows **60 requests per minute** — more than enough for casual practice sessions.
+> The free tier allows **60 requests per minute** and **1,500 requests per day** — more than enough for practice sessions.
 
 ---
 
-## Step 2 – Log in to Firebase
+## Step 2 – Merge This Pull Request
+
+On GitHub, open this PR and click **"Merge pull request"**. Then pull the latest code to your local machine:
+
+```bash
+git pull origin main
+```
+
+---
+
+## Step 3 – Log in to Firebase
 
 ```bash
 firebase login
 ```
 
-Select your Google account when prompted.
-
----
-
-## Step 3 – Set the Active Firebase Project
-
-```bash
-firebase use flashcardapp-3c280
-```
+Select your Google account when prompted. You only need to do this once.
 
 ---
 
@@ -57,37 +59,39 @@ cd ..
 firebase deploy --only functions
 ```
 
-After a successful deploy you will see output similar to:
+After a successful deploy you will see output like this:
 
 ```
 ✔  functions[chat(us-central1)]: Successful create operation.
 Function URL (chat(us-central1)): https://us-central1-flashcardapp-3c280.cloudfunctions.net/chat
 ```
 
-**Copy that URL** — you'll need it in the app settings.
+**Copy that URL** — you'll need it in Step 7.
 
 ---
 
-## Step 6 – Deploy the Hosting (optional)
-
-If you want Firebase to also host your frontend:
+## Step 6 – Deploy the Frontend to Firebase Hosting
 
 ```bash
 firebase deploy --only hosting
 ```
 
-Your site will be available at **[https://flashcardapp-3c280.web.app](https://flashcardapp-3c280.web.app)**.
+Your site will be live at **[https://flashcardapp-3c280.web.app](https://flashcardapp-3c280.web.app)**.
+
+> Or you can deploy both at once: `firebase deploy`
 
 ---
 
-## Step 7 – Configure the App
+## Step 7 – Configure the App Settings
 
 1. Open your German Flashcard website
 2. Enter your name to log in
 3. Click **⚙️ Settings** (top-right corner)
-4. Paste your **Gemini API key** and click **Save Key**
-5. Paste the **Cloud Function URL** from Step 5 and click **Save URL**
-6. Click **Close**
+4. Paste your **Gemini API key** (from Step 1) → click **💾 Save Key**
+5. Paste the **Cloud Function URL** (from Step 5) → click **💾 Save URL**
+6. Click **✖ Close**
+
+> ⚠️ Your API key is saved only in **your browser's localStorage** — it is never sent to any server other than Google's Gemini API via your own Cloud Function.
 
 ---
 
@@ -95,8 +99,8 @@ Your site will be available at **[https://flashcardapp-3c280.web.app](https://fl
 
 1. Click the **💬 Chat with AI** tab
 2. Choose your difficulty level (Beginner / Intermediate / Advanced)
-3. Type a message in German or English and press **Enter** (or click **Send**)
-4. Deutsch-Buddy will reply, correct any mistakes, and keep the conversation going!
+3. Type a message in German or English and press **Enter** (or click **Send ➤**)
+4. Deutsch-Buddy will reply, correct any grammar mistakes, and keep the conversation going!
 
 ---
 
