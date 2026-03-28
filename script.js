@@ -3848,6 +3848,9 @@ function initChat() {
     } catch (_) {
         chatHistory = [];
     }
+
+    // Initialize speech features (mic input + TTS output)
+    initSpeech();
 }
 
 function saveDifficulty() {
@@ -3883,6 +3886,16 @@ function appendMessage(role, content, save) {
     const bubble = document.createElement("div");
     bubble.className = "message-bubble";
     bubble.textContent = content;
+
+    // Add a "Read aloud" button to AI message bubbles
+    if (role !== "user" && window.speechSynthesis) {
+        const speakBtn = document.createElement("button");
+        speakBtn.className = "btn-speak";
+        speakBtn.title = "Read aloud in German";
+        speakBtn.textContent = "🔊 Read aloud";
+        speakBtn.onclick = () => speakText(content);
+        bubble.appendChild(speakBtn);
+    }
 
     wrapper.appendChild(avatar);
     wrapper.appendChild(bubble);
@@ -4003,6 +4016,11 @@ async function sendChatMessage() {
             appendErrorMessage("❌ " + (data.error || "Unexpected error. Please try again."));
         } else {
             appendMessage("model", data.response, true);
+            // Auto-read the AI reply aloud if the 🔊 toggle is enabled
+            const autoReadToggle = document.getElementById("auto-read-toggle");
+            if (autoReadToggle && autoReadToggle.checked) {
+                speakText(data.response);
+            }
         }
     } catch (err) {
         removeTypingIndicator();
@@ -4034,6 +4052,100 @@ function clearChatHistory() {
     while (container.children.length > 1) {
         container.removeChild(container.lastChild);
     }
+}
+
+// ============================================================
+// SPEECH – Microphone input (SpeechRecognition) +
+//          Text-to-speech output (SpeechSynthesis)
+// Both use the browser's built-in Web Speech API – no API key needed.
+// ============================================================
+
+let recognition = null;
+let isRecording = false;
+
+function initSpeech() {
+    const Recog = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const micBtn = document.getElementById("btn-mic");
+
+    // Restore the auto-read preference
+    const autoRead = localStorage.getItem("chatAutoRead") === "true";
+    const toggle = document.getElementById("auto-read-toggle");
+    if (toggle) toggle.checked = autoRead;
+
+    // If the browser doesn't support mic input, hide the button quietly
+    if (!Recog) {
+        if (micBtn) micBtn.style.display = "none";
+        return;
+    }
+
+    recognition = new Recog();
+    recognition.lang = "de-DE";        // Optimised for German practice
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.continuous = false;
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        const inputEl = document.getElementById("chat-input");
+        if (inputEl) {
+            // Append transcript to any text the user may already have typed
+            inputEl.value = (inputEl.value ? inputEl.value + " " : "") + transcript;
+            inputEl.focus();
+        }
+    };
+
+    recognition.onend = () => {
+        isRecording = false;
+        if (micBtn) {
+            micBtn.classList.remove("recording");
+            micBtn.title = "Speak your message";
+        }
+    };
+
+    recognition.onerror = (event) => {
+        isRecording = false;
+        if (micBtn) {
+            micBtn.classList.remove("recording");
+            micBtn.title = "Speak your message";
+        }
+        if (event.error === "not-allowed") {
+            appendErrorMessage("🎤 Microphone access was denied. Please allow microphone access in your browser settings and try again.");
+        }
+    };
+}
+
+function toggleMic() {
+    if (!recognition) return;
+    const micBtn = document.getElementById("btn-mic");
+    if (isRecording) {
+        recognition.stop();
+    } else {
+        try {
+            recognition.start();
+            isRecording = true;
+            if (micBtn) {
+                micBtn.classList.add("recording");
+                micBtn.title = "Stop recording";
+            }
+        } catch (_) {
+            // recognition.start() throws if already started; safe to ignore
+        }
+    }
+}
+
+function speakText(text) {
+    if (!window.speechSynthesis) return;
+    // Cancel any speech already in progress
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "de-DE";
+    utterance.rate = 0.9;   // Slightly slower – easier to follow while learning
+    window.speechSynthesis.speak(utterance);
+}
+
+function saveAutoRead() {
+    const toggle = document.getElementById("auto-read-toggle");
+    if (toggle) localStorage.setItem("chatAutoRead", String(toggle.checked));
 }
 
 

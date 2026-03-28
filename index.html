@@ -72,6 +72,9 @@
                             <option value="Intermediate">Intermediate</option>
                             <option value="Advanced">Advanced</option>
                         </select>
+                        <label class="auto-read-label" title="Deutsch-Buddy will read its replies aloud in German">
+                            <input type="checkbox" id="auto-read-toggle" onchange="saveAutoRead()"> 🔊
+                        </label>
                         <button class="btn-clear-chat" onclick="clearChatHistory()" title="Clear conversation">🗑️</button>
                     </div>
                 </div>
@@ -81,7 +84,7 @@
                         <span class="message-avatar">🤖</span>
                         <div class="message-bubble">
                             Hallo! Ich bin Deutsch-Buddy, dein KI-Gesprächspartner! (Hello! I'm Deutsch-Buddy, your AI conversation partner!)<br><br>
-                            I'll help you practice German. I can correct your grammar and explain mistakes. Type anything to get started – in German or English!<br><br>
+                            I'll help you practice German. I can correct your grammar and explain mistakes. <strong>Type</strong> or tap <strong>🎤</strong> to speak – in German or English!<br><br>
                             ⚙️ Remember to add your <strong>free Gemini API key</strong> in <em>Settings</em> first.
                         </div>
                     </div>
@@ -94,6 +97,7 @@
                         rows="2"
                         onkeydown="handleChatKeydown(event)"
                     ></textarea>
+                    <button class="btn-mic" id="btn-mic" onclick="toggleMic()" title="Speak your message" aria-label="Speak your message">🎤</button>
                     <button class="btn-send" id="btn-send" onclick="sendChatMessage()">Send ➤</button>
                 </div>
             </div>

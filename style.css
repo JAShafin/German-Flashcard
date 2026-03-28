@@ -389,6 +389,71 @@ img {
     cursor: not-allowed;
 }
 
+/* Mic button */
+.btn-mic {
+    padding: 10px 14px;
+    font-size: 18px;
+    background: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    height: 42px;
+    flex-shrink: 0;
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-mic:hover {
+    background: #e0e0e0;
+}
+
+.btn-mic.recording {
+    background: #e53935;
+    color: #fff;
+    border-color: #c62828;
+    animation: pulse-mic 1s ease-in-out infinite;
+}
+
+@keyframes pulse-mic {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.6; }
+}
+
+/* Speak-aloud button on AI bubbles */
+.btn-speak {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    opacity: 0.45;
+    padding: 3px 4px;
+    margin-top: 6px;
+    border-radius: 4px;
+    display: block;
+    transition: opacity 0.2s;
+}
+
+.btn-speak:hover {
+    opacity: 1;
+}
+
+/* Auto-read checkbox in chat header */
+.auto-read-label {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 13px;
+    color: #dce8f8;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.auto-read-label input[type="checkbox"] {
+    cursor: pointer;
+    accent-color: #fff;
+}
+
 /* ============================================================
    SETTINGS MODAL
    ============================================================ */
