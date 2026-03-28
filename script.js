@@ -3955,7 +3955,7 @@ const DIFFICULTY_PROMPTS = {
         "Respond almost entirely in German. Only provide translations when absolutely necessary.",
 };
 
-const GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent";
+const GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
 async function sendChatMessage() {
     const inputEl = document.getElementById("chat-input");
