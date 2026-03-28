@@ -3762,19 +3762,14 @@ function openSettings() {
     const modal = document.getElementById("settings-modal");
     modal.style.display = "flex";
 
-    // Populate saved values (mask the API key)
+    // Populate saved API key (masked)
     const savedKey = localStorage.getItem("geminiApiKey") || "";
     const input = document.getElementById("api-key-input");
     input.type = "password";
     input.value = savedKey;
 
-    const savedUrl = localStorage.getItem("chatFunctionUrl") || "";
-    document.getElementById("function-url-input").value = savedUrl;
-
     document.getElementById("api-key-status").textContent = savedKey ? "✅ API key is saved." : "";
     document.getElementById("api-key-status").className = "settings-status success";
-    document.getElementById("function-url-status").textContent = savedUrl ? "✅ URL is saved." : "";
-    document.getElementById("function-url-status").className = "settings-status success";
 }
 
 function closeSettings() {
@@ -3797,24 +3792,6 @@ function saveApiKey() {
     }
     localStorage.setItem("geminiApiKey", key);
     status.textContent = "✅ API key saved!";
-    status.className = "settings-status success";
-}
-
-function saveFunctionUrl() {
-    const url = document.getElementById("function-url-input").value.trim();
-    const status = document.getElementById("function-url-status");
-    if (!url) {
-        status.textContent = "⚠️ Please enter a URL.";
-        status.className = "settings-status error";
-        return;
-    }
-    if (!url.startsWith("https://")) {
-        status.textContent = "⚠️ URL must start with https://";
-        status.className = "settings-status error";
-        return;
-    }
-    localStorage.setItem("chatFunctionUrl", url);
-    status.textContent = "✅ URL saved!";
     status.className = "settings-status success";
 }
 
@@ -3963,6 +3940,23 @@ function appendErrorMessage(text) {
     container.scrollTop = container.scrollHeight;
 }
 
+// Difficulty-level system prompts (mirrors what the Cloud Function used to provide)
+const DIFFICULTY_PROMPTS = {
+    Beginner:
+        "You are tutoring a complete beginner. Use very simple German sentences (A1-A2 level). " +
+        "Always provide English translations in parentheses after German words or phrases. " +
+        "Keep sentences short and vocabulary basic.",
+    Intermediate:
+        "You are tutoring an intermediate learner. Use B1-B2 level German with moderate vocabulary. " +
+        "Provide English translations only for uncommon words. " +
+        "Encourage longer sentences and correct verb conjugations.",
+    Advanced:
+        "You are tutoring an advanced learner. Use C1-C2 level German with rich vocabulary and complex grammar. " +
+        "Respond almost entirely in German. Only provide translations when absolutely necessary.",
+};
+
+const GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+
 async function sendChatMessage() {
     const inputEl = document.getElementById("chat-input");
     const sendBtn = document.getElementById("btn-send");
@@ -3977,55 +3971,80 @@ async function sendChatMessage() {
         return;
     }
 
-    const functionUrl = localStorage.getItem("chatFunctionUrl");
-    if (!functionUrl) {
-        appendErrorMessage(
-            "⚙️ No Cloud Function URL set. Please deploy the Firebase Cloud Function and add its URL in Settings. See DEPLOYMENT.md for instructions."
-        );
-        return;
-    }
-
     // Display user message
     appendMessage("user", message, true);
     inputEl.value = "";
     sendBtn.disabled = true;
 
     const difficulty = document.getElementById("difficulty-select").value;
+    const levelPrompt = DIFFICULTY_PROMPTS[difficulty] || DIFFICULTY_PROMPTS.Beginner;
+    const systemPrompt =
+        `You are a friendly and encouraging German language tutor named "Deutsch-Buddy". ` +
+        `Your goal is to help the user practice German conversation.\n\n` +
+        `Rules:\n` +
+        `1. ${levelPrompt}\n` +
+        `2. If the user writes in English, respond in German and gently encourage them to try German.\n` +
+        `3. If the user makes a grammar or spelling mistake in German, politely correct it. ` +
+        `Show the corrected sentence clearly, e.g. "✏️ Correction: [corrected sentence]", then briefly explain the rule.\n` +
+        `4. Keep responses concise (2–4 sentences) and conversational.\n` +
+        `5. End each response with a follow-up question to keep the conversation going.\n` +
+        `6. Be warm, patient, and supportive.`;
+
     const typingEl = appendTypingIndicator();
 
+    // Build conversation contents for Gemini (exclude the current user message which
+    // is already appended to chatHistory; send everything except the last entry so we
+    // can pass the current message in the final "user" turn).
+    const historyForApi = chatHistory.slice(0, -1).map((msg) => ({
+        role: msg.role === "user" ? "user" : "model",
+        parts: [{ text: String(msg.content) }],
+    }));
+    historyForApi.push({ role: "user", parts: [{ text: message }] });
+
     try {
-        const response = await fetch(functionUrl, {
+        const response = await fetch(GEMINI_API_BASE, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "x-goog-api-key": apiKey,
+            },
             body: JSON.stringify({
-                message,
-                // Pass prior conversation as context; the current message is sent
-                // separately via the `message` field and forwarded to sendMessage()
-                // in the Cloud Function, so we exclude the last entry (current user
-                // message) to avoid duplicating it.
-                history: chatHistory.slice(0, -1),
-                difficulty,
-                apiKey,
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                contents: historyForApi,
+                generationConfig: { maxOutputTokens: 512 },
             }),
         });
 
         const data = await response.json();
         removeTypingIndicator();
 
-        if (!response.ok || data.error) {
-            appendErrorMessage("❌ " + (data.error || "Unexpected error. Please try again."));
+        if (!response.ok) {
+            const errMsg =
+                data.error && data.error.message
+                    ? data.error.message
+                    : "Unexpected error. Please try again.";
+            const friendlyMsg =
+                response.status === 401 || response.status === 403
+                    ? "Invalid Gemini API key. Please check your key in Settings."
+                    : errMsg;
+            appendErrorMessage("❌ " + friendlyMsg);
         } else {
-            appendMessage("model", data.response, true);
-            // Auto-read the AI reply aloud if the 🔊 toggle is enabled
-            const autoReadToggle = document.getElementById("auto-read-toggle");
-            if (autoReadToggle && autoReadToggle.checked) {
-                speakText(data.response);
+            const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (aiText) {
+                appendMessage("model", aiText, true);
+                // Auto-read the AI reply aloud if the 🔊 toggle is enabled
+                const autoReadToggle = document.getElementById("auto-read-toggle");
+                if (autoReadToggle && autoReadToggle.checked) {
+                    speakText(aiText);
+                }
+            } else {
+                appendErrorMessage("❌ Received an empty response from the AI. Please try again.");
             }
         }
     } catch (err) {
         removeTypingIndicator();
         appendErrorMessage(
-            "❌ Could not reach the AI service. Check that the Cloud Function URL is correct and that your function is deployed."
+            "❌ Could not reach the Gemini API. Please check your internet connection and API key."
         );
     } finally {
         sendBtn.disabled = false;
