@@ -4009,7 +4009,7 @@ async function sendChatMessage() {
                 "x-goog-api-key": apiKey,
             },
             body: JSON.stringify({
-                systemInstruction: { parts: [{ text: systemPrompt }] },
+                system: { parts: [{ text: systemPrompt }] },
                 contents: historyForApi,
                 generationConfig: { maxOutputTokens: 512 },
             }),
