@@ -114,7 +114,7 @@
                 <p class="settings-hint">
                     Get your <strong>free</strong> API key at
                     <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a>.
-                    The key is stored only in your browser.
+                    The key is stored only in your browser and used to call Gemini directly — no server required.
                 </p>
                 <input
                     type="password"
@@ -127,23 +127,6 @@
                     <button onclick="toggleApiKeyVisibility()" class="btn-secondary">👁️ Show/Hide</button>
                 </div>
                 <p id="api-key-status" class="settings-status"></p>
-            </div>
-
-            <div class="settings-section">
-                <h4>Cloud Function URL</h4>
-                <p class="settings-hint">
-                    After deploying the Firebase Cloud Function, paste its URL here.
-                    See <code>DEPLOYMENT.md</code> for instructions.
-                </p>
-                <input
-                    type="text"
-                    id="function-url-input"
-                    placeholder="https://us-central1-YOUR-PROJECT.cloudfunctions.net/chat"
-                />
-                <div class="settings-actions">
-                    <button onclick="saveFunctionUrl()">💾 Save URL</button>
-                </div>
-                <p id="function-url-status" class="settings-status"></p>
             </div>
 
             <button class="btn-close-modal" onclick="closeSettings()">✖ Close</button>
