@@ -3986,7 +3986,11 @@ async function sendChatMessage() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 message,
-                history: chatHistory.slice(0, -1), // exclude the message we just added
+                // Pass prior conversation as context; the current message is sent
+                // separately via the `message` field and forwarded to sendMessage()
+                // in the Cloud Function, so we exclude the last entry (current user
+                // message) to avoid duplicating it.
+                history: chatHistory.slice(0, -1),
                 difficulty,
                 apiKey,
             }),
