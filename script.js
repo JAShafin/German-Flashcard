@@ -14,7 +14,7 @@ let currentIndex = 0;
 let learnedWords = [];
 let currentGroup = "";
 
-// ✅ FIXED: Save username & go to category screen
+// Save username & go to category screen
 function saveUserName() {
     const input = document.getElementById("userNameInput").value.trim();
     if (input) {
@@ -23,11 +23,14 @@ function saveUserName() {
         namePrompt.style.display = "none";
         title.style.display = "block";
         groupButtons.style.display = "flex";
+        document.getElementById("tab-nav").style.display = "flex";
+        document.getElementById("settings-button").style.display = "block";
         showGroupButtons();
+        initChat();
     }
 }
 
-// ✅ FIXED: Load everything correctly on refresh
+// Load everything correctly on refresh
 window.onload = function () {
     userName = localStorage.getItem("userName");
     flashcard.style.display = "none";
@@ -37,7 +40,10 @@ window.onload = function () {
         namePrompt.style.display = "none";
         title.style.display = "block";
         groupButtons.style.display = "flex";
+        document.getElementById("tab-nav").style.display = "flex";
+        document.getElementById("settings-button").style.display = "block";
         showGroupButtons();
+        initChat();
     } else {
         namePrompt.style.display = "block";
         title.style.display = "block";
@@ -3723,8 +3729,424 @@ const wordGroups = {
 
 };
 
+// ============================================================
+// TAB NAVIGATION
+// ============================================================
 
+function switchTab(tab) {
+    const flashcardsSection = document.getElementById("flashcards-section");
+    const chatSection = document.getElementById("chat-section");
+    const tabFlashcards = document.getElementById("tab-flashcards");
+    const tabChat = document.getElementById("tab-chat");
 
+    if (tab === "flashcards") {
+        flashcardsSection.style.display = "block";
+        chatSection.style.display = "none";
+        tabFlashcards.classList.add("active");
+        tabChat.classList.remove("active");
+    } else {
+        flashcardsSection.style.display = "none";
+        chatSection.style.display = "block";
+        tabFlashcards.classList.remove("active");
+        tabChat.classList.add("active");
+        // Focus the input for convenience
+        document.getElementById("chat-input").focus();
+    }
+}
+
+// ============================================================
+// SETTINGS MODAL
+// ============================================================
+
+function openSettings() {
+    const modal = document.getElementById("settings-modal");
+    modal.style.display = "flex";
+
+    // Populate saved values (mask the API key)
+    const savedKey = localStorage.getItem("geminiApiKey") || "";
+    const input = document.getElementById("api-key-input");
+    input.type = "password";
+    input.value = savedKey;
+
+    const savedUrl = localStorage.getItem("chatFunctionUrl") || "";
+    document.getElementById("function-url-input").value = savedUrl;
+
+    document.getElementById("api-key-status").textContent = savedKey ? "✅ API key is saved." : "";
+    document.getElementById("api-key-status").className = "settings-status success";
+    document.getElementById("function-url-status").textContent = savedUrl ? "✅ URL is saved." : "";
+    document.getElementById("function-url-status").className = "settings-status success";
+}
+
+function closeSettings() {
+    document.getElementById("settings-modal").style.display = "none";
+}
+
+function closeSettingsOnOverlay(event) {
+    if (event.target === document.getElementById("settings-modal")) {
+        closeSettings();
+    }
+}
+
+function saveApiKey() {
+    const key = document.getElementById("api-key-input").value.trim();
+    const status = document.getElementById("api-key-status");
+    if (!key) {
+        status.textContent = "⚠️ Please enter an API key.";
+        status.className = "settings-status error";
+        return;
+    }
+    localStorage.setItem("geminiApiKey", key);
+    status.textContent = "✅ API key saved!";
+    status.className = "settings-status success";
+}
+
+function saveFunctionUrl() {
+    const url = document.getElementById("function-url-input").value.trim();
+    const status = document.getElementById("function-url-status");
+    if (!url) {
+        status.textContent = "⚠️ Please enter a URL.";
+        status.className = "settings-status error";
+        return;
+    }
+    if (!url.startsWith("https://")) {
+        status.textContent = "⚠️ URL must start with https://";
+        status.className = "settings-status error";
+        return;
+    }
+    localStorage.setItem("chatFunctionUrl", url);
+    status.textContent = "✅ URL saved!";
+    status.className = "settings-status success";
+}
+
+function toggleApiKeyVisibility() {
+    const input = document.getElementById("api-key-input");
+    input.type = input.type === "password" ? "text" : "password";
+}
+
+// ============================================================
+// CHAT
+// ============================================================
+
+// In-memory conversation history (also persisted to localStorage)
+let chatHistory = [];
+
+const CHAT_STORAGE_KEY = "deutschBuddyChatHistory";
+
+function initChat() {
+    // Restore difficulty preference
+    const savedDifficulty = localStorage.getItem("chatDifficulty") || "Beginner";
+    const select = document.getElementById("difficulty-select");
+    if (select) select.value = savedDifficulty;
+
+    // Restore chat history from localStorage
+    try {
+        const stored = localStorage.getItem(CHAT_STORAGE_KEY);
+        if (stored) {
+            chatHistory = JSON.parse(stored);
+            renderChatHistory();
+        }
+    } catch (_) {
+        chatHistory = [];
+    }
+
+    // Initialize speech features (mic input + TTS output)
+    initSpeech();
+}
+
+function saveDifficulty() {
+    const val = document.getElementById("difficulty-select").value;
+    localStorage.setItem("chatDifficulty", val);
+}
+
+function renderChatHistory() {
+    const container = document.getElementById("chat-messages");
+    if (!container) return;
+
+    // Keep only the welcome message (first child) then append history
+    while (container.children.length > 1) {
+        container.removeChild(container.lastChild);
+    }
+
+    chatHistory.forEach((msg) => {
+        appendMessage(msg.role, msg.content, false);
+    });
+}
+
+function appendMessage(role, content, save) {
+    const container = document.getElementById("chat-messages");
+    if (!container) return;
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "chat-message " + (role === "user" ? "user-message" : "ai-message");
+
+    const avatar = document.createElement("span");
+    avatar.className = "message-avatar";
+    avatar.textContent = role === "user" ? "🧑" : "🤖";
+
+    const bubble = document.createElement("div");
+    bubble.className = "message-bubble";
+    bubble.textContent = content;
+
+    // Add a "Read aloud" button to AI message bubbles
+    if (role !== "user" && window.speechSynthesis) {
+        const speakBtn = document.createElement("button");
+        speakBtn.className = "btn-speak";
+        speakBtn.title = "Read aloud in German";
+        speakBtn.textContent = "🔊 Read aloud";
+        speakBtn.onclick = () => speakText(content);
+        bubble.appendChild(speakBtn);
+    }
+
+    wrapper.appendChild(avatar);
+    wrapper.appendChild(bubble);
+    container.appendChild(wrapper);
+
+    // Scroll to bottom
+    container.scrollTop = container.scrollHeight;
+
+    if (save) {
+        chatHistory.push({ role, content });
+        try {
+            localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(chatHistory));
+        } catch (_) {
+            // Ignore storage quota errors
+        }
+    }
+}
+
+function appendTypingIndicator() {
+    const container = document.getElementById("chat-messages");
+    if (!container) return null;
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "chat-message ai-message chat-typing";
+    wrapper.id = "typing-indicator";
+
+    const avatar = document.createElement("span");
+    avatar.className = "message-avatar";
+    avatar.textContent = "🤖";
+
+    const bubble = document.createElement("div");
+    bubble.className = "message-bubble";
+    bubble.textContent = "Deutsch-Buddy is typing";
+
+    wrapper.appendChild(avatar);
+    wrapper.appendChild(bubble);
+    container.appendChild(wrapper);
+    container.scrollTop = container.scrollHeight;
+    return wrapper;
+}
+
+function removeTypingIndicator() {
+    const el = document.getElementById("typing-indicator");
+    if (el) el.remove();
+}
+
+function appendErrorMessage(text) {
+    const container = document.getElementById("chat-messages");
+    if (!container) return;
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "chat-message ai-message chat-error";
+
+    const avatar = document.createElement("span");
+    avatar.className = "message-avatar";
+    avatar.textContent = "⚠️";
+
+    const bubble = document.createElement("div");
+    bubble.className = "message-bubble";
+    bubble.textContent = text;
+
+    wrapper.appendChild(avatar);
+    wrapper.appendChild(bubble);
+    container.appendChild(wrapper);
+    container.scrollTop = container.scrollHeight;
+}
+
+async function sendChatMessage() {
+    const inputEl = document.getElementById("chat-input");
+    const sendBtn = document.getElementById("btn-send");
+    const message = inputEl.value.trim();
+    if (!message) return;
+
+    const apiKey = localStorage.getItem("geminiApiKey");
+    if (!apiKey) {
+        appendErrorMessage(
+            "⚙️ No Gemini API key found. Please open Settings (top-right) and add your free API key from https://aistudio.google.com/app/apikey"
+        );
+        return;
+    }
+
+    const functionUrl = localStorage.getItem("chatFunctionUrl");
+    if (!functionUrl) {
+        appendErrorMessage(
+            "⚙️ No Cloud Function URL set. Please deploy the Firebase Cloud Function and add its URL in Settings. See DEPLOYMENT.md for instructions."
+        );
+        return;
+    }
+
+    // Display user message
+    appendMessage("user", message, true);
+    inputEl.value = "";
+    sendBtn.disabled = true;
+
+    const difficulty = document.getElementById("difficulty-select").value;
+    const typingEl = appendTypingIndicator();
+
+    try {
+        const response = await fetch(functionUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                message,
+                // Pass prior conversation as context; the current message is sent
+                // separately via the `message` field and forwarded to sendMessage()
+                // in the Cloud Function, so we exclude the last entry (current user
+                // message) to avoid duplicating it.
+                history: chatHistory.slice(0, -1),
+                difficulty,
+                apiKey,
+            }),
+        });
+
+        const data = await response.json();
+        removeTypingIndicator();
+
+        if (!response.ok || data.error) {
+            appendErrorMessage("❌ " + (data.error || "Unexpected error. Please try again."));
+        } else {
+            appendMessage("model", data.response, true);
+            // Auto-read the AI reply aloud if the 🔊 toggle is enabled
+            const autoReadToggle = document.getElementById("auto-read-toggle");
+            if (autoReadToggle && autoReadToggle.checked) {
+                speakText(data.response);
+            }
+        }
+    } catch (err) {
+        removeTypingIndicator();
+        appendErrorMessage(
+            "❌ Could not reach the AI service. Check that the Cloud Function URL is correct and that your function is deployed."
+        );
+    } finally {
+        sendBtn.disabled = false;
+        inputEl.focus();
+    }
+}
+
+function handleChatKeydown(event) {
+    // Send on Enter (without Shift)
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendChatMessage();
+    }
+}
+
+function clearChatHistory() {
+    if (!confirm("Clear the entire conversation? This cannot be undone.")) return;
+    chatHistory = [];
+    localStorage.removeItem(CHAT_STORAGE_KEY);
+
+    const container = document.getElementById("chat-messages");
+    if (!container) return;
+    // Keep only the welcome message
+    while (container.children.length > 1) {
+        container.removeChild(container.lastChild);
+    }
+}
+
+// ============================================================
+// SPEECH – Microphone input (SpeechRecognition) +
+//          Text-to-speech output (SpeechSynthesis)
+// Both use the browser's built-in Web Speech API – no API key needed.
+// ============================================================
+
+let recognition = null;
+let isRecording = false;
+
+function initSpeech() {
+    const Recog = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const micBtn = document.getElementById("btn-mic");
+
+    // Restore the auto-read preference
+    const autoRead = localStorage.getItem("chatAutoRead") === "true";
+    const toggle = document.getElementById("auto-read-toggle");
+    if (toggle) toggle.checked = autoRead;
+
+    // If the browser doesn't support mic input, hide the button quietly
+    if (!Recog) {
+        if (micBtn) micBtn.style.display = "none";
+        return;
+    }
+
+    recognition = new Recog();
+    recognition.lang = "de-DE";        // Optimised for German practice
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.continuous = false;
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        const inputEl = document.getElementById("chat-input");
+        if (inputEl) {
+            // Append transcript to any text the user may already have typed
+            inputEl.value = (inputEl.value ? inputEl.value + " " : "") + transcript;
+            inputEl.focus();
+        }
+    };
+
+    recognition.onend = () => {
+        isRecording = false;
+        if (micBtn) {
+            micBtn.classList.remove("recording");
+            micBtn.title = "Speak your message";
+        }
+    };
+
+    recognition.onerror = (event) => {
+        isRecording = false;
+        if (micBtn) {
+            micBtn.classList.remove("recording");
+            micBtn.title = "Speak your message";
+        }
+        if (event.error === "not-allowed") {
+            appendErrorMessage("🎤 Microphone access was denied. Please allow microphone access in your browser settings and try again.");
+        }
+    };
+}
+
+function toggleMic() {
+    if (!recognition) return;
+    const micBtn = document.getElementById("btn-mic");
+    if (isRecording) {
+        recognition.stop();
+    } else {
+        try {
+            recognition.start();
+            isRecording = true;
+            if (micBtn) {
+                micBtn.classList.add("recording");
+                micBtn.title = "Stop recording";
+            }
+        } catch (_) {
+            // recognition.start() throws if already started; safe to ignore
+        }
+    }
+}
+
+function speakText(text) {
+    if (!window.speechSynthesis) return;
+    // Cancel any speech already in progress
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "de-DE";
+    utterance.rate = 0.9;   // Slightly slower – easier to follow while learning
+    window.speechSynthesis.speak(utterance);
+}
+
+function saveAutoRead() {
+    const toggle = document.getElementById("auto-read-toggle");
+    if (toggle) localStorage.setItem("chatAutoRead", String(toggle.checked));
+}
 
 
 
