@@ -261,7 +261,6 @@ function renderGrammarTopics() {
     const progress = loadGrammarProgress();
     topics.innerHTML = `<button class="grammar-topic-card" onclick="openGrammarModule('core')"><span class="topic-icon">§</span><span><strong>Subordinate Clause</strong><small></small></span><span class="topic-arrow">→</span></button>`;
     topics.innerHTML += allGrammarSections.slice(grammarSections.length).map(section => `<button class="grammar-topic-card" onclick="openGrammarModule('${section.id}')"><span class="topic-icon">§</span><span><strong>${section.title}</strong><small></small></span><span class="topic-arrow">→</span></button>`).join("");
-
 }
 
 function openGrammarModule(sectionId) {
