@@ -924,38 +924,44 @@ window.extraGrammarSections = [
 const expansionTheory = {
     konjunktiv: {
         rules: [
-            ["Helper construction", "Use würde + infinitive at the very end for most verbs.", "Ich würde ein Auto kaufen."],
-            ["Core irregulars", "Memorize hätte, wäre, könnte, müsste, dürfte, wüsste, wollte, and sollte."],
-            ["Unreal past", "Use hätte or wäre + past participle for regrets and unreal past events.", "Ich hätte das Haus gekauft."],
-            ["Wenn drop", "Formal hypothetical clauses can use inversion: Hätte ich Zeit, würde ich kommen."],
+            ["Konjunktiv II", "Konjunktiv II is used constantly for polite requests, wishes, and hypothetical what-if scenarios."],
+            ["Helper construction", "Most verbs use würde + the infinitive at the very end.", "Ich würde ein Auto kaufen."],
+            ["Core irregulars", "Memorize haben -> hätte, sein -> wäre, können -> könnte, müssen -> müsste, dürfen -> dürfte, wissen -> wüsste, wollen -> wollte, and sollen -> sollte."],
+            ["Unreal past", "Use wäre or hätte + the past participle at the end for regrets or unreal past events.", "Ich wäre nach Berlin gefahren. / Ich hätte das Haus gekauft."],
+            ["Wenn drop", "For fluent B2 inversion, drop wenn and begin with the conjugated verb.", "Hätte ich Zeit, würde ich kommen. / Wäre ich reich, würde ich ein Boot kaufen."],
             ["Passive hypothetical", "Use würde, müsste, or könnte + past participle + werden.", "Das Auto müsste repariert werden."]
         ], triggers: []
     },
     future: {
         rules: [
-            ["Futur I", "Use werden + infinitive at the end for future plans and predictions.", "Ich werde morgen arbeiten."],
-            ["Future assumptions", "Use werden with words such as wohl or schon to make an assumption.", "Er wird wohl zu Hause sein."],
-            ["Futur II", "Use werden + past participle + haben or sein at the end for completed future actions or past assumptions.", "Bis morgen werde ich das Buch gelesen haben."],
-            ["Modal verbs", "With a modal verb, the infinitive and modal infinitive form a double infinitive at the end.", "Wir werden das Auto reparieren können."]
+            ["Futur I", "Form future plans and predictions with werden + infinitive at the absolute end.", "Ich werde dich morgen anrufen."],
+            ["Present assumptions", "For guesses about the present, use Futur I with words like wohl or schon.", "Er wird wohl zu Hause sein."],
+            ["Futur II", "Use werden + past participle + haben or sein at the end for an action completed by a future point or an assumption about the past.", "Bis morgen werde ich das Buch gelesen haben. / Sie wird den Zug verpasst haben."],
+            ["Double infinitive modal trap", "With a modal verb in the future, do not use a past participle. Push both infinitives to the end, with the modal verb last.", "Ich werde morgen arbeiten müssen. / Wir werden das Auto reparieren können."]
         ], triggers: []
     },
     comparison: {
         rules: [
+            ["Three stages", "Adjectives have Positive (equal), Comparative (more/less), and Superlative (most) forms."],
             ["Positive", "Use so + adjective + wie for equal comparisons.", "Er ist so groß wie ich."],
-            ["Comparative", "Add -er and use als for unequal comparisons.", "Mein Auto ist schneller als dein Auto."],
-            ["Superlative", "Use am + -sten or der/die/das + -ste for the highest degree.", "Heute ist der kälteste Tag des Jahres."],
-            ["Irregular forms", "Important forms include gut/besser/am besten, viel/mehr/am meisten, and gern lieber/am liebsten."],
-            ["Adjective endings", "Attributive adjectives keep their normal endings after comparative and superlative markers.", "Ein schnelleres Auto."]
+            ["Comparative", "Add -er and use als for unequal comparisons.", "Er ist schneller als ich."],
+            ["Superlative", "Use am + adjective + -sten at the end of a sentence, or der/die/das + -ste before a noun.", "Er ist am schnellsten."],
+            ["Umlaut shift", "Many short one-syllable adjectives with a, o, or u take an umlaut in comparative and superlative forms: alt -> älter -> am ältesten."],
+            ["-el and -er drop", "Adjectives ending in -el or -er drop their e in the comparative: teuer -> teurer, dunkel -> dunkler."],
+            ["Superlative e-insertion", "Adjectives ending in -d, -t, -s, -z, or -sch need an extra e in the superlative: heiß -> am heißesten, kalt -> am kältesten."],
+            ["Crucial irregulars", "Memorize gut -> besser -> am besten; viel -> mehr -> am meisten; gern -> lieber -> am liebsten; hoch -> höher -> am höchsten; nah -> näher -> am nächsten."],
+            ["Attributive endings", "Comparative and superlative forms before nouns still take standard adjective endings.", "Ein schnelleres Auto. / Das beste Buch."]
         ], triggers: []
     },
     passive: {
         rules: [
-            ["Process passive", "Use werden + past participle to focus on an action in the present.", "Das Auto wird repariert."],
-            ["Past passive", "Use wurde/wurden + past participle for a completed past action.", "Das Haus wurde 1990 gebaut."],
-            ["Perfect passive", "Use ist/sind + past participle + worden.", "Die Rechnung ist schon bezahlt worden."],
-            ["Modal passive", "Use modal verb + past participle + werden.", "Das Problem muss sofort gelöst werden."],
-            ["State passive", "Use sein + past participle for the resulting state.", "Das Geschäft ist geschlossen."],
-            ["Dative and impersonal passive", "Dative objects stay dative, and impersonal actions can use es wird/es wurde.", "Mir wird geholfen. / Es wird hier viel getanzt."]
+            ["Focus on the action", "Passive voice is used when the action matters more than who performs it.", "Das Auto wird repariert."],
+            ["Process passive", "Use werden + past participle at the end. In the present: Das Auto wird repariert. In the simple past: Das Auto wurde repariert."],
+            ["Perfect and future passive", "Perfect uses ist/sind + past participle + worden. Futur I uses wird + past participle + werden.", "Die Rechnung ist schon bezahlt worden. / Das Auto wird repariert werden."],
+            ["Modal passive", "The modal is conjugated, the past participle comes before the final infinitive werden.", "Das Problem muss gelöst werden. / Das Problem musste gelöst werden."],
+            ["State passive", "When the action is finished and you describe the resulting state, use sein instead of werden.", "Das Fenster ist geschlossen."],
+            ["Dative trap", "A verb’s dative object remains dative in passive voice; it does not become the subject.", "Mir wird geholfen. / Ihm wurde gedankt."],
+            ["Impersonal passive", "Passive voice can describe a general activity without a subject, often with es or a fronted adverb.", "Es wird hier viel getanzt. / Hier wird nicht geraucht."]
         ], triggers: []
     }
 };

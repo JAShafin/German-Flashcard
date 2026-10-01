@@ -330,8 +330,8 @@ function renderGrammarTheory() {
     const theory = document.getElementById("grammar-theory");
     if (!theory || !section) return;
     const rules = section.theory.rules.map(rule => `<div class="theory-rule"><h4>${rule[0]}</h4><p>${rule[1]}</p>${rule[2] ? `<p class="grammar-example">${rule[2]}</p>` : ""}</div>`).join("");
-    const triggers = section.theory.triggers.map(row => `<tr><th>${row[0]}</th><td><strong>${row[1]}</strong></td><td>${row[2]}</td></tr>`).join("");
-    theory.innerHTML = `<p class="theory-intro">${section.theory.intro}</p><div class="theory-rules">${rules}</div><div class="trigger-table-wrap"><table class="trigger-table"><thead><tr><th>Category</th><th>Words / structure</th><th>Example</th></tr></thead><tbody>${triggers}</tbody></table></div>`;
+    const table = section.theory.triggers.length ? `<div class="trigger-table-wrap"><table class="trigger-table"><thead><tr><th>Category</th><th>Words / structure</th><th>Example</th></tr></thead><tbody>${section.theory.triggers.map(row => `<tr><th>${row[0]}</th><td><strong>${row[1]}</strong></td><td>${row[2]}</td></tr>`).join("")}</tbody></table></div>` : "";
+    theory.innerHTML = `<p class="theory-intro">${section.theory.intro}</p><div class="theory-rules">${rules}</div>${table}`;
 }
 
 function startGrammarPractice() {
