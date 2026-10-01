@@ -259,7 +259,7 @@ function renderGrammarTopics() {
     const topics = document.getElementById("grammar-topic-list");
     if (!topics) return;
     const progress = loadGrammarProgress();
-    topics.innerHTML = `<button class="grammar-topic-card" onclick="openGrammarModule('core')"><span class="topic-icon">§</span><span><strong>Subordinate Clause</strong><small>Core rules, relative clauses, and infinitive clauses</small></span><span class="topic-arrow">→</span></button>`;
+    topics.innerHTML = `<button class="grammar-topic-card" onclick="openGrammarModule('core')"><span class="topic-icon">§</span><span><strong>Subordinate Clause</strong><small></small></span><span class="topic-arrow">→</span></button>`;
     topics.innerHTML += allGrammarSections.slice(grammarSections.length).map(section => `<button class="grammar-topic-card" onclick="openGrammarModule('${section.id}')"><span class="topic-icon">§</span><span><strong>${section.title}</strong><small></small></span><span class="topic-arrow">→</span></button>`).join("");
     const learned = grammarSections.reduce((total, section) => total + (progress[section.id] || []).length, 0);
     const total = grammarSections.reduce((sum, section) => sum + section.sentences.length, 0);
