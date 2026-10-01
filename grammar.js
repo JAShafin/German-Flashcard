@@ -261,6 +261,7 @@ function renderGrammarTopics() {
     const progress = loadGrammarProgress();
     topics.innerHTML = `<button class="grammar-topic-card" onclick="openGrammarModule('core')"><span class="topic-icon">§</span><span><strong>Subordinate Clause</strong><small></small></span><span class="topic-arrow">→</span></button>`;
     topics.innerHTML += allGrammarSections.slice(grammarSections.length).map(section => `<button class="grammar-topic-card" onclick="openGrammarModule('${section.id}')"><span class="topic-icon">§</span><span><strong>${section.title}</strong><small></small></span><span class="topic-arrow">→</span></button>`).join("");
+    topics.innerHTML += `<button class="grammar-topic-card" onclick="initDativeGame()" style="background:#e8f5e9; border-color:#81c784;"><span class="topic-icon" style="color:#2e7d32;">🎯</span><span><strong style="color:#2e7d32;">Dative Verb Mastery</strong></span><span class="topic-arrow">→</span></button>`;
 }
 
 function openGrammarModule(sectionId) {
@@ -391,8 +392,21 @@ function resetGrammarSection(sectionId) {
 }
 
 function resetGrammarProgress() {
-    if (!confirm("Reset all grammar progress?")) return;
-    localStorage.removeItem(GRAMMAR_PROGRESS_KEY);
+    // Ask specifically about the current section
+    if (!confirm(`Reset progress for ${activeGrammarSection.shortTitle}?`)) return;
+
+    // 1. Load the master save file (which holds all sections)
+    const progress = loadGrammarProgress();
+
+    // 2. Delete ONLY the progress array for the currently active tab/section
+    if (activeGrammarSection && activeGrammarSection.id) {
+        delete progress[activeGrammarSection.id];
+    }
+
+    // 3. Save the file back (all other sections remain untouched!)
+    saveGrammarProgress(progress);
+
+    // 4. Refresh the UI to show the new 0% state
     renderGrammarDashboard();
     renderGrammarTopics();
     startGrammarPractice();
