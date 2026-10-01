@@ -602,3 +602,333 @@ img {
         padding: 20px 16px;
     }
 }
+
+/* ============================================================
+   GRAMMAR LAB
+   ============================================================ */
+#grammar-section {
+    width: min(100%, 920px);
+    text-align: left;
+    color: #263238;
+    padding-bottom: 32px;
+}
+
+.grammar-heading {
+    background: linear-gradient(135deg, #fff8ed, #f1f8f6);
+    border: 1px solid #e4ded2;
+    border-radius: 12px;
+    padding: 26px 30px;
+    margin: 12px 0 18px;
+}
+
+.grammar-heading .eyebrow {
+    color: #b25b36;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 0 0 6px;
+}
+
+.grammar-heading h3 {
+    margin: 0 0 8px;
+    font-size: clamp(22px, 4vw, 32px);
+    color: #24343a;
+}
+
+.grammar-heading p:last-child {
+    margin: 0;
+    color: #5d6a6d;
+    line-height: 1.6;
+}
+
+.grammar-dashboard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.grammar-progress-card {
+    background: #fff;
+    border: 1px solid #dfe6e3;
+    border-radius: 8px;
+    padding: 13px;
+}
+
+.progress-card-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 9px;
+    font-size: 13px;
+}
+
+.progress-card-top span {
+    color: #b25b36;
+    font-weight: bold;
+}
+
+.progress-track {
+    height: 7px;
+    background: #e8eeeb;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress-track span {
+    display: block;
+    height: 100%;
+    background: #3c8d7b;
+    transition: width .35s ease;
+}
+
+.grammar-progress-card small {
+    display: block;
+    color: #718080;
+    margin-top: 8px;
+}
+
+.grammar-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #dfe6e3;
+    margin-bottom: 18px;
+}
+
+.grammar-section-tabs {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.grammar-tab,
+.grammar-reset,
+.show-answer,
+.practice-again,
+.practice-next,
+.grammar-secondary {
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: bold;
+    padding: 10px 14px;
+    transition: transform .15s ease, background .15s ease;
+}
+
+.grammar-tab {
+    background: transparent;
+    color: #61716f;
+    border-bottom: 3px solid transparent;
+    border-radius: 0;
+}
+
+.grammar-tab.active {
+    color: #246b5d;
+    border-bottom-color: #3c8d7b;
+}
+
+.grammar-reset {
+    background: #fff;
+    color: #a34e3d;
+    border-color: #e3bbb2;
+    font-size: 13px;
+}
+
+.grammar-reset:hover,
+.grammar-tab:hover,
+.show-answer:hover,
+.practice-again:hover,
+.practice-next:hover,
+.grammar-secondary:hover {
+    transform: translateY(-1px);
+}
+
+.grammar-theory {
+    background: #fff;
+    border: 1px solid #dfe6e3;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 18px;
+}
+
+.theory-intro {
+    color: #536365;
+    font-size: 16px;
+    line-height: 1.65;
+    margin: 0 0 20px;
+}
+
+.theory-rules {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.theory-rule {
+    background: #f7faf8;
+    border-left: 4px solid #3c8d7b;
+    border-radius: 4px;
+    padding: 14px 16px;
+}
+
+.theory-rule h4 {
+    margin: 0 0 6px;
+    color: #285f55;
+    font-size: 15px;
+}
+
+.theory-rule p {
+    line-height: 1.55;
+    margin: 0;
+    font-size: 14px;
+}
+
+.theory-rule .grammar-example {
+    color: #a65032;
+    font-weight: bold;
+    margin-top: 9px;
+}
+
+.trigger-table-wrap {
+    overflow-x: auto;
+}
+
+.trigger-table {
+    border-collapse: collapse;
+    min-width: 620px;
+    width: 100%;
+    font-size: 14px;
+}
+
+.trigger-table th,
+.trigger-table td {
+    border-bottom: 1px solid #e2e9e6;
+    padding: 11px 10px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.trigger-table th {
+    background: #edf5f1;
+    color: #285f55;
+}
+
+.trigger-table td:nth-child(2) {
+    color: #a65032;
+}
+
+.grammar-practice-panel {
+    background: #263f43;
+    border-radius: 8px;
+    color: #fff;
+    min-height: 220px;
+    padding: 24px;
+}
+
+.practice-meta {
+    color: #b8d8cf;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+}
+
+.english-prompt {
+    font-size: clamp(20px, 3vw, 28px);
+    line-height: 1.35;
+    margin: 34px 0 22px;
+}
+
+.answer-area {
+    min-height: 34px;
+}
+
+.german-answer {
+    color: #ffd39b;
+    font-size: 20px;
+    line-height: 1.45;
+    margin: 0 0 18px;
+    animation: answer-reveal .25s ease-out;
+}
+
+@keyframes answer-reveal {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.practice-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.show-answer {
+    background: #ffd39b;
+    color: #3c2b1b;
+}
+
+.practice-again {
+    background: #d97967;
+    color: #fff;
+}
+
+.practice-next {
+    background: #78c6a9;
+    color: #173e35;
+}
+
+.grammar-complete {
+    padding: 16px 0;
+    text-align: center;
+}
+
+.grammar-complete span {
+    color: #ffd39b;
+    font-size: 36px;
+}
+
+.grammar-complete h3 {
+    margin: 8px 0;
+}
+
+.grammar-complete p {
+    color: #c4d6d3;
+}
+
+.grammar-secondary {
+    background: transparent;
+    border-color: #9ecfc0;
+    color: #fff;
+}
+
+@media (max-width: 640px) {
+    #grammar-section {
+        width: 100%;
+    }
+
+    .grammar-heading,
+    .grammar-theory,
+    .grammar-practice-panel {
+        padding: 18px;
+    }
+
+    .grammar-dashboard,
+    .theory-rules {
+        grid-template-columns: 1fr;
+    }
+
+    .grammar-toolbar {
+        align-items: stretch;
+    }
+
+    .grammar-reset {
+        width: 100%;
+    }
+}

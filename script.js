@@ -24,9 +24,8 @@ function saveUserName() {
         title.style.display = "block";
         groupButtons.style.display = "flex";
         document.getElementById("tab-nav").style.display = "flex";
-        document.getElementById("settings-button").style.display = "block";
         showGroupButtons();
-        initChat();
+        initializeGrammar();
     }
 }
 
@@ -41,9 +40,8 @@ window.onload = function () {
         title.style.display = "block";
         groupButtons.style.display = "flex";
         document.getElementById("tab-nav").style.display = "flex";
-        document.getElementById("settings-button").style.display = "block";
         showGroupButtons();
-        initChat();
+        initializeGrammar();
     } else {
         namePrompt.style.display = "block";
         title.style.display = "block";
@@ -3735,22 +3733,21 @@ const wordGroups = {
 
 function switchTab(tab) {
     const flashcardsSection = document.getElementById("flashcards-section");
-    const chatSection = document.getElementById("chat-section");
+    const grammarSection = document.getElementById("grammar-section");
     const tabFlashcards = document.getElementById("tab-flashcards");
-    const tabChat = document.getElementById("tab-chat");
+    const tabGrammar = document.getElementById("tab-grammar");
 
     if (tab === "flashcards") {
         flashcardsSection.style.display = "block";
-        chatSection.style.display = "none";
+        grammarSection.style.display = "none";
         tabFlashcards.classList.add("active");
-        tabChat.classList.remove("active");
+        tabGrammar.classList.remove("active");
     } else {
         flashcardsSection.style.display = "none";
-        chatSection.style.display = "block";
+        grammarSection.style.display = "block";
         tabFlashcards.classList.remove("active");
-        tabChat.classList.add("active");
-        // Focus the input for convenience
-        document.getElementById("chat-input").focus();
+        tabGrammar.classList.add("active");
+        initializeGrammar();
     }
 }
 
