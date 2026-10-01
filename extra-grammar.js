@@ -82,7 +82,7 @@ window.extraGrammarSections = [
         title: "Future Tense (Futur I & II)",
         shortTitle: "Future Tenses",
         theory: {
-            intro: "German is famously relaxed about the future. For most planned events, Germans just use the Present Tense + a time word (e.g., <i>Ich komme morgen</i>). However, the explicit future tenses are vital for <b>promises, predictions, and assumptions</b>.",
+            intro: "German is famously relaxed about the future tense. For most planned events, Germans just use the Present Tense + a time word (e.g., <i>Ich komme morgen</i>). However, the explicit future tenses are vital for <b>promises, predictions, and assumptions</b>.",
             rules: [
                 ["1. Futur I (Promises and Predictions)", "Used for actions happening in the future.<br><br><div style='background:#f4f6f8; padding:10px; border-radius:5px; border-left:4px solid #1976d2; font-family:monospace; font-size:1.1em;'>Subject + <b style='color:#1976d2;'>werden</b> + [Rest] + <b style='color:#d32f2f;'>Infinitive</b></div>", "The Promise: Ich <b style='color:#1976d2;'>werde</b> dich immer <b style='color:#d32f2f;'>lieben</b>.<br>The Prediction: Es <b style='color:#1976d2;'>wird</b> morgen <b style='color:#d32f2f;'>regnen</b>."],
                 ["2. Futur I (Present Assumptions)", "If you guess what someone is doing <b>right now</b>, you use Futur I combined with probability words like <i>wohl</i> (probably) or <i>schon</i> (already).", "Er <b style='color:#1976d2;'>wird</b> wohl zu Hause <b style='color:#d32f2f;'>sein</b>. (He is probably at home right now.)"],
