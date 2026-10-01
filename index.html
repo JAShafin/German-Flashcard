@@ -10,56 +10,76 @@
 
 <body>
 
-    <!-- ✅ Home Button -->
+    <!-- Home Button (top-left) -->
     <button id="home-button" onclick="goHome()" style="display: none;">Home</button>
 
     <div class="container">
-        <!-- ✅ Title -->
+        <!-- Title -->
         <h2 id="title">German Vocabulary Flashcards</h2>
 
-        <!-- ✅ Name Prompt -->
+        <!-- Name Prompt -->
         <div id="namePrompt" class="name-box">
             <p>Please enter your name:</p>
             <input type="text" id="userNameInput" />
             <button onclick="saveUserName()">Start</button>
         </div>
 
-        <!-- ✅ Group Buttons -->
-        <div id="group-buttons" style="display: none;"></div>
+        <!-- Tab Navigation (visible after login) -->
+        <div id="tab-nav" class="tab-nav" style="display: none;">
+            <button class="tab-btn active" id="tab-flashcards" onclick="switchTab('flashcards')">📚 Flashcards</button>
+            <button class="tab-btn" id="tab-grammar" onclick="switchTab('grammar')">🧠 Grammar Lab</button>
+        </div>
 
-        <!-- ✅ Flashcard Area -->
-        <div id="flashcard-container">
-            <div class="flashcard" id="flashcard" style="display: none;">
-                <div class="front" id="card-front">Word</div>
-                <div class="back" id="card-back">
-                    <p><strong>Word</strong> = Meaning</p>
-                    <img id="image" src="" alt="word image" />
+        <!-- ===== FLASHCARDS TAB ===== -->
+        <div id="flashcards-section">
+            <!-- Group Selection Buttons -->
+            <div id="group-buttons" style="display: none;"></div>
+
+            <!-- Credit -->
+            <p class="credit">Developed by Shaf 🤙</p>
+
+            <!-- Flashcard -->
+            <div id="flashcard-container">
+                <div class="flashcard" id="flashcard" style="display: none;">
+                    <div class="front" id="card-front">Word</div>
+                    <div class="back" id="card-back">
+                        <p><strong>Word</strong> = Meaning</p>
+                        <img id="image" src="" alt="word image" />
+                    </div>
                 </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="buttons" id="buttons" style="display: none;">
+                <button onclick="flipCard()">Flip</button>
+                <button onclick="markAsLearned()">Learned</button>
+                <button onclick="nextWord()">Practice</button>
             </div>
         </div>
 
-        <!-- ✅ Action Buttons -->
-        <div class="buttons" id="buttons" style="display: none;">
-            <button onclick="flipCard()">Flip</button>
-            <button onclick="markAsLearned()">Learned</button>
-            <button onclick="nextWord()">Practice</button>
+        <!-- ===== GRAMMAR LAB ===== -->
+        <div id="grammar-section" style="display: none;">
+            <div class="grammar-heading">
+                <p class="eyebrow">German Grammar Lab</p>
+                <h3>Build the sentence, then make it yours.</h3>
+                <p>Read the rule, reveal the answer, and use Practice or Next to shape your personal review queue.</p>
+            </div>
+            <div class="grammar-dashboard" id="grammar-dashboard"></div>
+            <div class="grammar-toolbar">
+                <div class="grammar-section-tabs" id="grammar-section-tabs"></div>
+                <button class="grammar-reset" onclick="resetGrammarProgress()">Reset all progress</button>
+            </div>
+            <article class="grammar-theory" id="grammar-theory"></article>
+            <section class="grammar-practice-panel" id="grammar-practice"></section>
         </div>
 
         <!-- ✅ Credit -->
         <p class="credit">Developed by Shaf 🤙</p>
     </div>
 
-
-    <!-- Firebase App (the core Firebase SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-
-
-
-    <!-- ✅ Script -->
+    <!-- JavaScript -->
     <script src="script.js"></script>
-
+    <script src="grammar.js"></script>
 </body>
 
 </html>
