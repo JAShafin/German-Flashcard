@@ -920,3 +920,46 @@ window.extraGrammarSections = [
         ]
     }
 ];
+
+const expansionTheory = {
+    konjunktiv: {
+        rules: [
+            ["Helper construction", "Use würde + infinitive at the very end for most verbs.", "Ich würde ein Auto kaufen."],
+            ["Core irregulars", "Memorize hätte, wäre, könnte, müsste, dürfte, wüsste, wollte, and sollte."],
+            ["Unreal past", "Use hätte or wäre + past participle for regrets and unreal past events.", "Ich hätte das Haus gekauft."],
+            ["Wenn drop", "Formal hypothetical clauses can use inversion: Hätte ich Zeit, würde ich kommen."],
+            ["Passive hypothetical", "Use würde, müsste, or könnte + past participle + werden.", "Das Auto müsste repariert werden."]
+        ], triggers: []
+    },
+    future: {
+        rules: [
+            ["Futur I", "Use werden + infinitive at the end for future plans and predictions.", "Ich werde morgen arbeiten."],
+            ["Future assumptions", "Use werden with words such as wohl or schon to make an assumption.", "Er wird wohl zu Hause sein."],
+            ["Futur II", "Use werden + past participle + haben or sein at the end for completed future actions or past assumptions.", "Bis morgen werde ich das Buch gelesen haben."],
+            ["Modal verbs", "With a modal verb, the infinitive and modal infinitive form a double infinitive at the end.", "Wir werden das Auto reparieren können."]
+        ], triggers: []
+    },
+    comparison: {
+        rules: [
+            ["Positive", "Use so + adjective + wie for equal comparisons.", "Er ist so groß wie ich."],
+            ["Comparative", "Add -er and use als for unequal comparisons.", "Mein Auto ist schneller als dein Auto."],
+            ["Superlative", "Use am + -sten or der/die/das + -ste for the highest degree.", "Heute ist der kälteste Tag des Jahres."],
+            ["Irregular forms", "Important forms include gut/besser/am besten, viel/mehr/am meisten, and gern lieber/am liebsten."],
+            ["Adjective endings", "Attributive adjectives keep their normal endings after comparative and superlative markers.", "Ein schnelleres Auto."]
+        ], triggers: []
+    },
+    passive: {
+        rules: [
+            ["Process passive", "Use werden + past participle to focus on an action in the present.", "Das Auto wird repariert."],
+            ["Past passive", "Use wurde/wurden + past participle for a completed past action.", "Das Haus wurde 1990 gebaut."],
+            ["Perfect passive", "Use ist/sind + past participle + worden.", "Die Rechnung ist schon bezahlt worden."],
+            ["Modal passive", "Use modal verb + past participle + werden.", "Das Problem muss sofort gelöst werden."],
+            ["State passive", "Use sein + past participle for the resulting state.", "Das Geschäft ist geschlossen."],
+            ["Dative and impersonal passive", "Dative objects stay dative, and impersonal actions can use es wird/es wurde.", "Mir wird geholfen. / Es wird hier viel getanzt."]
+        ], triggers: []
+    }
+};
+
+window.extraGrammarSections.forEach(section => {
+    section.theory = { ...section.theory, ...(expansionTheory[section.id] || {}) };
+});
