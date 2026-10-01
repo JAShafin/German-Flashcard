@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>German Vocabulary Flashcards</title>
-    <link rel="stylesheet" href="style.css?v=20261001-3" />
+    <link rel="stylesheet" href="style.css?v=20261001-4" />
 </head>
 
 <body>
@@ -59,24 +59,39 @@
 
         <!-- ===== GRAMMAR LAB ===== -->
         <div id="grammar-section" style="display: none;">
-            <div class="grammar-heading">
+            <div id="grammar-home">
+                <div class="grammar-heading">
                 <p class="eyebrow">German Grammar Lab</p>
-                <h3>Build the sentence, then make it yours.</h3>
-                <p>Read the rule, reveal the answer, and use Practice or Next to shape your personal review queue.</p>
+                    <h3>Choose a grammar section</h3>
+                    <p>Each topic has its own theory, practice queue, and progress.</p>
+                </div>
+                <div class="grammar-topic-list" id="grammar-topic-list"></div>
             </div>
-            <div class="grammar-dashboard" id="grammar-dashboard"></div>
-            <div class="grammar-toolbar">
-                <div class="grammar-section-tabs" id="grammar-section-tabs"></div>
-                <button class="grammar-reset" onclick="resetGrammarProgress()">Reset all progress</button>
+            <div id="grammar-module" style="display: none;">
+                <button class="grammar-back" onclick="closeGrammarModule()">← All grammar sections</button>
+                <div class="grammar-heading grammar-module-heading">
+                    <p class="eyebrow">Grammar Section</p>
+                    <h3 id="grammar-module-title">Subordinate Clause</h3>
+                    <p>Study the rule when you need it, then keep the practice screen focused on one sentence at a time.</p>
+                </div>
+                <div class="grammar-dashboard" id="grammar-dashboard"></div>
+                <div class="grammar-toolbar">
+                    <div class="grammar-section-tabs" id="grammar-section-tabs"></div>
+                    <button class="grammar-reset" onclick="resetGrammarProgress()">Reset all progress</button>
+                </div>
+                <div class="grammar-view-tabs">
+                    <button id="grammar-view-theory" onclick="showGrammarView('theory')">Theory</button>
+                    <button id="grammar-view-practice" class="active" onclick="showGrammarView('practice')">Practice</button>
+                </div>
+                <article class="grammar-theory" id="grammar-theory"></article>
+                <section class="grammar-practice-panel" id="grammar-practice"></section>
             </div>
-            <article class="grammar-theory" id="grammar-theory"></article>
-            <section class="grammar-practice-panel" id="grammar-practice"></section>
         </div>
     </div>
 
     <!-- JavaScript -->
-    <script src="script.js?v=20261001-3"></script>
-    <script src="grammar.js?v=20261001-3"></script>
+    <script src="script.js?v=20261001-4"></script>
+    <script src="grammar.js?v=20261001-4"></script>
 </body>
 
 </html>

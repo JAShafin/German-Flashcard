@@ -248,8 +248,45 @@ let grammarCursor = 0;
 let grammarAnswerShown = false;
 
 function initializeGrammar() {
+    document.getElementById("grammar-home").style.display = "block";
+    document.getElementById("grammar-module").style.display = "none";
+    renderGrammarTopics();
+}
+
+function renderGrammarTopics() {
+    const topics = document.getElementById("grammar-topic-list");
+    if (!topics) return;
+    const progress = loadGrammarProgress();
+    topics.innerHTML = `<button class="grammar-topic-card" onclick="openGrammarModule('core')"><span class="topic-icon">§</span><span><strong>Subordinate Clause</strong><small>Core rules, relative clauses, and infinitive clauses</small></span><span class="topic-arrow">→</span></button>`;
+    const learned = grammarSections.reduce((total, section) => total + (progress[section.id] || []).length, 0);
+    const total = grammarSections.reduce((sum, section) => sum + section.sentences.length, 0);
+    topics.innerHTML += `<p class="grammar-topic-progress">${learned} of ${total} subordinate-clause sentences learned</p>`;
+}
+
+function openGrammarModule(sectionId) {
+    document.getElementById("grammar-home").style.display = "none";
+    document.getElementById("grammar-module").style.display = "block";
     renderGrammarDashboard();
     renderGrammarSections();
+    selectGrammarSection(sectionId || "core");
+}
+
+function closeGrammarModule() {
+    document.getElementById("grammar-module").style.display = "none";
+    document.getElementById("grammar-home").style.display = "block";
+    renderGrammarTopics();
+}
+
+function showGrammarView(view) {
+    const theory = document.getElementById("grammar-theory");
+    const practice = document.getElementById("grammar-practice");
+    const theoryButton = document.getElementById("grammar-view-theory");
+    const practiceButton = document.getElementById("grammar-view-practice");
+    const showTheory = view === "theory";
+    theory.style.display = showTheory ? "block" : "none";
+    practice.style.display = showTheory ? "none" : "block";
+    theoryButton.classList.toggle("active", showTheory);
+    practiceButton.classList.toggle("active", !showTheory);
 }
 
 function renderGrammarDashboard() {
@@ -273,10 +310,12 @@ function renderGrammarSections() {
 
 function selectGrammarSection(sectionId) {
     activeGrammarSection = grammarSections.find(section => section.id === sectionId) || grammarSections[0];
+    document.getElementById("grammar-module-title").textContent = "Subordinate Clause";
     const selector = document.getElementById("grammar-section-tabs");
     if (selector) selector.querySelectorAll(".grammar-tab").forEach(button => button.classList.toggle("active", button.textContent === activeGrammarSection.shortTitle));
     renderGrammarTheory();
     startGrammarPractice();
+    showGrammarView("practice");
 }
 
 function renderGrammarTheory() {
@@ -351,5 +390,6 @@ function resetGrammarProgress() {
     if (!confirm("Reset all grammar progress?")) return;
     localStorage.removeItem(GRAMMAR_PROGRESS_KEY);
     renderGrammarDashboard();
+    renderGrammarTopics();
     startGrammarPractice();
 }

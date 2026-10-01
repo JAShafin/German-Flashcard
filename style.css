@@ -932,3 +932,120 @@ img {
         width: 100%;
     }
 }
+
+.grammar-topic-list {
+    display: grid;
+    gap: 12px;
+    margin: 18px 0;
+}
+
+.grammar-topic-card {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #dfe6e3;
+    border-radius: 8px;
+    color: #263238;
+    cursor: pointer;
+    display: grid;
+    gap: 14px;
+    grid-template-columns: 44px 1fr auto;
+    padding: 18px;
+    text-align: left;
+    transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+    width: 100%;
+}
+
+.grammar-topic-card:hover {
+    border-color: #3c8d7b;
+    box-shadow: 0 6px 18px rgba(38, 63, 67, .08);
+    transform: translateY(-2px);
+}
+
+.topic-icon {
+    align-items: center;
+    background: #e8f2ee;
+    border-radius: 50%;
+    color: #286b5d;
+    display: flex;
+    font-size: 22px;
+    height: 44px;
+    justify-content: center;
+    width: 44px;
+}
+
+.grammar-topic-card strong,
+.grammar-topic-card small {
+    display: block;
+}
+
+.grammar-topic-card strong {
+    font-size: 17px;
+    margin-bottom: 4px;
+}
+
+.grammar-topic-card small,
+.grammar-topic-progress {
+    color: #6b7979;
+    line-height: 1.5;
+}
+
+.topic-arrow {
+    color: #b25b36;
+    font-size: 24px;
+}
+
+.grammar-topic-progress {
+    font-size: 13px;
+    margin: 0;
+    text-align: right;
+}
+
+.grammar-back {
+    background: transparent;
+    border: 0;
+    color: #286b5d;
+    cursor: pointer;
+    font: inherit;
+    font-weight: bold;
+    margin: 8px 0 4px;
+    padding: 8px 0;
+}
+
+.grammar-back:hover {
+    color: #b25b36;
+}
+
+.grammar-module-heading {
+    margin-top: 8px;
+}
+
+.grammar-view-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 0 0 14px;
+}
+
+.grammar-view-tabs button {
+    background: #edf5f1;
+    border: 1px solid #cfe0d9;
+    border-radius: 6px;
+    color: #42625c;
+    cursor: pointer;
+    font: inherit;
+    font-weight: bold;
+    padding: 9px 16px;
+}
+
+.grammar-view-tabs button.active {
+    background: #286b5d;
+    border-color: #286b5d;
+    color: #fff;
+}
+
+#grammar-theory {
+    margin-top: 0;
+}
+
+#grammar-practice {
+    margin-top: 0;
+}
