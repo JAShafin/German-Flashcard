@@ -75,7 +75,8 @@
                         <label class="auto-read-label" title="Deutsch-Buddy will read its replies aloud in German">
                             <input type="checkbox" id="auto-read-toggle" onchange="saveAutoRead()"> 🔊
                         </label>
-                        <button class="btn-clear-chat" onclick="clearChatHistory()" title="Clear conversation">🗑️</button>
+                        <button class="btn-clear-chat" onclick="clearChatHistory()"
+                            title="Clear conversation">🗑️</button>
                     </div>
                 </div>
 
@@ -83,21 +84,21 @@
                     <div class="chat-message ai-message">
                         <span class="message-avatar">🤖</span>
                         <div class="message-bubble">
-                            Hallo! Ich bin Deutsch-Buddy, dein KI-Gesprächspartner! (Hello! I'm Deutsch-Buddy, your AI conversation partner!)<br><br>
-                            I'll help you practice German. I can correct your grammar and explain mistakes. <strong>Type</strong> or tap <strong>🎤</strong> to speak – in German or English!<br><br>
+                            Hallo! Ich bin Deutsch-Buddy, dein KI-Gesprächspartner! (Hello! I'm Deutsch-Buddy, your AI
+                            conversation partner!)<br><br>
+                            I'll help you practice German. I can correct your grammar and explain mistakes.
+                            <strong>Type</strong> or tap <strong>🎤</strong> to speak – in German or English!<br><br>
                             ⚙️ Remember to add your <strong>free Gemini API key</strong> in <em>Settings</em> first.
                         </div>
                     </div>
                 </div>
 
                 <div class="chat-input-area">
-                    <textarea
-                        id="chat-input"
+                    <textarea id="chat-input"
                         placeholder="Type your message in German or English… (Enter to send, Shift+Enter for new line)"
-                        rows="2"
-                        onkeydown="handleChatKeydown(event)"
-                    ></textarea>
-                    <button class="btn-mic" id="btn-mic" onclick="toggleMic()" title="Speak your message" aria-label="Speak your message">🎤</button>
+                        rows="2" onkeydown="handleChatKeydown(event)"></textarea>
+                    <button class="btn-mic" id="btn-mic" onclick="toggleMic()" title="Speak your message"
+                        aria-label="Speak your message">🎤</button>
                     <button class="btn-send" id="btn-send" onclick="sendChatMessage()">Send ➤</button>
                 </div>
             </div>
@@ -113,15 +114,12 @@
                 <h4>Gemini API Key</h4>
                 <p class="settings-hint">
                     Get your <strong>free</strong> API key at
-                    <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a>.
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank"
+                        rel="noopener">aistudio.google.com</a>.
                     The key is stored only in your browser and used to call Gemini directly — no server required.
                 </p>
-                <input
-                    type="password"
-                    id="api-key-input"
-                    placeholder="Paste your Gemini API key here"
-                    autocomplete="off"
-                />
+                <input type="password" id="api-key-input" placeholder="Paste your Gemini API key here"
+                    autocomplete="off" />
                 <div class="settings-actions">
                     <button onclick="saveApiKey()">💾 Save Key</button>
                     <button onclick="toggleApiKeyVisibility()" class="btn-secondary">👁️ Show/Hide</button>
