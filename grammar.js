@@ -220,6 +220,7 @@ const grammarSections = [
 ];
 
 const GRAMMAR_PROGRESS_KEY = "germanGrammarProgress";
+const allGrammarSections = [...grammarSections, ...(window.extraGrammarSections || [])];
 
 function loadGrammarProgress() {
     try {
@@ -243,6 +244,7 @@ function speakGrammar(text) {
 }
 
 let activeGrammarSection = null;
+let activeGrammarTopicId = "core";
 let grammarQueue = [];
 let grammarCursor = 0;
 let grammarAnswerShown = false;
@@ -258,12 +260,14 @@ function renderGrammarTopics() {
     if (!topics) return;
     const progress = loadGrammarProgress();
     topics.innerHTML = `<button class="grammar-topic-card" onclick="openGrammarModule('core')"><span class="topic-icon">§</span><span><strong>Subordinate Clause</strong><small>Core rules, relative clauses, and infinitive clauses</small></span><span class="topic-arrow">→</span></button>`;
+    topics.innerHTML += allGrammarSections.slice(grammarSections.length).map(section => `<button class="grammar-topic-card" onclick="openGrammarModule('${section.id}')"><span class="topic-icon">§</span><span><strong>${section.title}</strong><small>Expansion Pack 1 · B2 practice</small></span><span class="topic-arrow">→</span></button>`).join("");
     const learned = grammarSections.reduce((total, section) => total + (progress[section.id] || []).length, 0);
     const total = grammarSections.reduce((sum, section) => sum + section.sentences.length, 0);
     topics.innerHTML += `<p class="grammar-topic-progress">${learned} of ${total} subordinate-clause sentences learned</p>`;
 }
 
 function openGrammarModule(sectionId) {
+    activeGrammarTopicId = sectionId;
     document.getElementById("grammar-home").style.display = "none";
     document.getElementById("grammar-module").style.display = "block";
     renderGrammarDashboard();
@@ -272,6 +276,7 @@ function openGrammarModule(sectionId) {
 }
 
 function closeGrammarModule() {
+    activeGrammarTopicId = "core";
     document.getElementById("grammar-module").style.display = "none";
     document.getElementById("grammar-home").style.display = "block";
     renderGrammarTopics();
@@ -293,7 +298,8 @@ function renderGrammarDashboard() {
     const dashboard = document.getElementById("grammar-dashboard");
     if (!dashboard) return;
     const progress = loadGrammarProgress();
-    dashboard.innerHTML = grammarSections.map(section => {
+    const sections = activeGrammarTopicId === "core" ? grammarSections : [allGrammarSections.find(section => section.id === activeGrammarTopicId)].filter(Boolean);
+    dashboard.innerHTML = sections.map(section => {
         const learned = (progress[section.id] || []).length;
         const total = section.sentences.length;
         const percent = total ? Math.round((learned / total) * 100) : 0;
@@ -304,13 +310,14 @@ function renderGrammarDashboard() {
 function renderGrammarSections() {
     const selector = document.getElementById("grammar-section-tabs");
     if (!selector) return;
-    selector.innerHTML = grammarSections.map((section, index) => `<button class="grammar-tab${index === 0 ? " active" : ""}" onclick="selectGrammarSection('${section.id}')">${section.shortTitle}</button>`).join("");
-    selectGrammarSection(grammarSections[0].id);
+    const sections = activeGrammarTopicId === "core" ? grammarSections : [allGrammarSections.find(section => section.id === activeGrammarTopicId)].filter(Boolean);
+    selector.innerHTML = sections.map((section, index) => `<button class="grammar-tab${index === 0 ? " active" : ""}" onclick="selectGrammarSection('${section.id}')">${section.shortTitle}</button>`).join("");
+    selectGrammarSection(sections[0].id);
 }
 
 function selectGrammarSection(sectionId) {
-    activeGrammarSection = grammarSections.find(section => section.id === sectionId) || grammarSections[0];
-    document.getElementById("grammar-module-title").textContent = "Subordinate Clause";
+    activeGrammarSection = allGrammarSections.find(section => section.id === sectionId) || grammarSections[0];
+    document.getElementById("grammar-module-title").textContent = activeGrammarTopicId === "core" ? "Subordinate Clause" : activeGrammarSection.title;
     const selector = document.getElementById("grammar-section-tabs");
     if (selector) selector.querySelectorAll(".grammar-tab").forEach(button => button.classList.toggle("active", button.textContent === activeGrammarSection.shortTitle));
     renderGrammarTheory();
