@@ -88,7 +88,7 @@ const accusativeVerbs = [
     { verb: "treffen", meaning: "to meet (someone)" }, { verb: "anrufen", meaning: "to call (someone)" },
     { verb: "bezahlen", meaning: "to pay" }, { verb: "vergessen", meaning: "to forget" },
 
-    // THE BRUTAL TRICK VERBS (Hidden synonyms - no more hints!)
+    // The Brutal Trick Verbs (Hidden synonyms - no more hints!)
     { verb: "beantworten", meaning: "to answer (something)" },
     { verb: "beraten", meaning: "to advise (someone)" },
     { verb: "befolgen", meaning: "to follow (rules)" },
@@ -119,6 +119,7 @@ const accusativeVerbs = [
 let dativeQueue = [];
 let currentVerbObj = null;
 let isCurrentDative = true;
+let consecutiveStreak = 0; // Tracks streaks to force difficulty
 const DATIVE_PROGRESS_KEY = "dativeMasteryProgress";
 
 function loadDativeProgress() {
@@ -132,7 +133,7 @@ function saveDativeProgress(learnedVerbs) {
 function resetDativeProgress() {
     if (!confirm("Reset all Dative Mastery progress?")) return;
     localStorage.removeItem(DATIVE_PROGRESS_KEY);
-    startDativeGame(); // Restarts the game instantly
+    startDativeGame();
 }
 
 function initDativeGame() {
@@ -141,7 +142,7 @@ function initDativeGame() {
     document.getElementById("grammar-module").style.display = "block";
     document.getElementById("grammar-module-title").textContent = "Dative Verb Mastery";
 
-    // 2. INJECT CSS TO HIDE THE GLOBAL UI ELEMENTS (Dashboard, Text, Global Reset Button)
+    // 2. INJECT CSS TO HIDE THE GLOBAL UI ELEMENTS
     const styleId = "dative-game-styles";
     if (!document.getElementById(styleId)) {
         const style = document.createElement("style");
@@ -193,6 +194,7 @@ function initDativeGame() {
 function startDativeGame() {
     const learned = loadDativeProgress();
     dativeQueue = dativeVerbs.filter(v => !learned.includes(v.verb));
+    consecutiveStreak = 0;
 
     if (dativeQueue.length === 0) {
         document.getElementById("dative-verb-display").innerText = "🏆 Mastered!";
@@ -207,21 +209,40 @@ function startDativeGame() {
 }
 
 function nextDativeVerb() {
+    // Reset Buttons UI
+    const btnAcc = document.getElementById("btn-acc");
+    const btnDat = document.getElementById("btn-dat");
+
+    btnAcc.disabled = false;
+    btnDat.disabled = false;
+    btnAcc.style.background = "white";
+    btnAcc.style.color = "#d32f2f";
+    btnAcc.style.borderColor = "#d32f2f";
+    btnAcc.style.opacity = "1";
+
+    btnDat.style.background = "white";
+    btnDat.style.color = "#388e3c";
+    btnDat.style.borderColor = "#388e3c";
+    btnDat.style.opacity = "1";
+
     document.getElementById("dative-feedback").innerText = "";
-    document.getElementById("btn-acc").style.display = "block";
-    document.getElementById("btn-dat").style.display = "block";
     document.getElementById("btn-next-dative").style.display = "none";
 
     const learnedCount = loadDativeProgress().length;
     document.getElementById("dative-progress").innerText = `Progress: ${learnedCount} / ${dativeVerbs.length}`;
 
-    // 50/50 Probability
-    if (Math.random() < 0.5 && dativeQueue.length > 0) {
+    // STREAK BREAKER ALGORITHM (Forces alternation if 2 of the same case appear in a row)
+    let forceDative = (consecutiveStreak <= -2);
+    let forceAccusative = (consecutiveStreak >= 2);
+
+    if ((Math.random() < 0.5 && !forceAccusative && dativeQueue.length > 0) || forceDative) {
         isCurrentDative = true;
+        consecutiveStreak = consecutiveStreak > 0 ? consecutiveStreak + 1 : 1;
         const randomIndex = Math.floor(Math.random() * dativeQueue.length);
         currentVerbObj = dativeQueue[randomIndex];
     } else {
         isCurrentDative = false;
+        consecutiveStreak = consecutiveStreak < 0 ? consecutiveStreak - 1 : -1;
         const randomIndex = Math.floor(Math.random() * accusativeVerbs.length);
         currentVerbObj = accusativeVerbs[randomIndex];
     }
@@ -239,14 +260,45 @@ function nextDativeVerb() {
 
 function checkDativeAnswer(selectedCase) {
     const feedback = document.getElementById("dative-feedback");
-    document.getElementById("btn-acc").style.display = "none";
-    document.getElementById("btn-dat").style.display = "none";
-    document.getElementById("btn-next-dative").style.display = "block";
+    const btnAcc = document.getElementById("btn-acc");
+    const btnDat = document.getElementById("btn-dat");
+    const btnNext = document.getElementById("btn-next-dative");
+
+    // Disable clicking again
+    btnAcc.disabled = true;
+    btnDat.disabled = true;
+    btnNext.style.display = "block";
 
     const isCorrect = (selectedCase === 'dat' && isCurrentDative) || (selectedCase === 'acc' && !isCurrentDative);
+    const actualCaseName = isCurrentDative ? "Dative" : "Accusative";
 
+    // Style the buttons to reflect the choice
+    if (selectedCase === 'dat') {
+        btnAcc.style.opacity = "0.3"; // Fade the unselected one
+        if (isCorrect) {
+            btnDat.style.background = "#388e3c"; // Green for correct choice
+            btnDat.style.color = "white";
+        } else {
+            btnDat.style.background = "#d32f2f"; // Red for incorrect choice
+            btnDat.style.borderColor = "#d32f2f";
+            btnDat.style.color = "white";
+        }
+    } else {
+        btnDat.style.opacity = "0.3"; // Fade the unselected one
+        if (isCorrect) {
+            btnAcc.style.background = "#388e3c"; // Green for correct choice
+            btnAcc.style.borderColor = "#388e3c";
+            btnAcc.style.color = "white";
+        } else {
+            btnAcc.style.background = "#d32f2f"; // Red for incorrect choice
+            btnAcc.style.borderColor = "#d32f2f";
+            btnAcc.style.color = "white";
+        }
+    }
+
+    // Explicit Text Feedback
     if (isCorrect) {
-        feedback.innerText = "✅ Correct!";
+        feedback.innerText = `✅ Correct! It takes the ${actualCaseName} case.`;
         feedback.style.color = "#388e3c";
 
         if (isCurrentDative) {
@@ -258,7 +310,7 @@ function checkDativeAnswer(selectedCase) {
             }
         }
     } else {
-        feedback.innerText = "❌ Incorrect.";
+        feedback.innerText = `❌ Incorrect. It takes the ${actualCaseName} case.`;
         feedback.style.color = "#d32f2f";
     }
 }
@@ -266,7 +318,6 @@ function checkDativeAnswer(selectedCase) {
 // Restore standard UI when closing the module
 const originalCloseGrammarModule = window.closeGrammarModule;
 window.closeGrammarModule = function () {
-    // Remove the CSS that hid the global elements
     const injectedStyles = document.getElementById("dative-game-styles");
     if (injectedStyles) injectedStyles.remove();
 
