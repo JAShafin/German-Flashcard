@@ -173,7 +173,8 @@ function initDativeGame() {
                 <div id="dative-progress" style="font-size: 0.9em; color:#666; margin-bottom:15px; font-weight:bold;">Progress: 0 / ${dativeVerbs.length}</div>
                 
                 <h1 id="dative-verb-display" style="font-size: 2.5em; margin: 10px 0; color:#1976d2;">Laden...</h1>
-                <p id="dative-meaning-display" style="color:#666; font-style:italic; margin-bottom:30px;">Loading...</p>
+                <!-- Notice we added visibility: hidden here to prevent layout shift while hiding the text -->
+                <p id="dative-meaning-display" style="color:#666; font-style:italic; margin-bottom:30px; visibility: hidden;">Loading...</p>
                 
                 <div id="dative-feedback" style="height: 24px; margin-bottom: 15px; font-weight:bold; font-size:1.1em;"></div>
 
@@ -199,6 +200,7 @@ function startDativeGame() {
     if (dativeQueue.length === 0) {
         document.getElementById("dative-verb-display").innerText = "🏆 Mastered!";
         document.getElementById("dative-meaning-display").innerText = "You have mastered all pure Dative verbs.";
+        document.getElementById("dative-meaning-display").style.visibility = "visible";
         document.getElementById("btn-acc").style.display = "none";
         document.getElementById("btn-dat").style.display = "none";
         document.getElementById("dative-progress").innerText = `Progress: ${dativeVerbs.length} / ${dativeVerbs.length}`;
@@ -247,8 +249,12 @@ function nextDativeVerb() {
         currentVerbObj = accusativeVerbs[randomIndex];
     }
 
+    // Update Text and Hide Meaning
     document.getElementById("dative-verb-display").innerText = currentVerbObj.verb;
-    document.getElementById("dative-meaning-display").innerText = currentVerbObj.meaning;
+
+    const meaningElement = document.getElementById("dative-meaning-display");
+    meaningElement.innerText = currentVerbObj.meaning;
+    meaningElement.style.visibility = "hidden"; // Hides meaning until user guesses
 
     if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
@@ -263,6 +269,9 @@ function checkDativeAnswer(selectedCase) {
     const btnAcc = document.getElementById("btn-acc");
     const btnDat = document.getElementById("btn-dat");
     const btnNext = document.getElementById("btn-next-dative");
+
+    // Reveal the meaning now that the user has answered
+    document.getElementById("dative-meaning-display").style.visibility = "visible";
 
     // Disable clicking again
     btnAcc.disabled = true;
