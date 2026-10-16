@@ -112,6 +112,9 @@ function startFlashcards(selectedGroup) {
     title.style.display = "none";
     homeButton.style.display = "block";
 
+    // HIDE THE TABS WHILE STUDYING
+    document.getElementById("tab-nav").style.display = "none";
+
     loadWord();
 }
 
@@ -207,6 +210,10 @@ function goHome() {
     buttons.style.display = "none";
     title.style.display = "block";
     homeButton.style.display = "none";
+
+    // SHOW THE TABS AGAIN WHEN RETURNING HOME
+    document.getElementById("tab-nav").style.display = "flex";
+
     showGroupButtons();
 }
 
