@@ -187,7 +187,7 @@ function flipCard() {
     const word = words[currentIndex];
 
     // Now that the card is flipped, speak the FULL word with the article
-    speak(`${word.german}. That means: ${word.english}`);
+    speak(`${word.german}. It means: ${word.english}`);
 }
 
 function markAsLearned() {
