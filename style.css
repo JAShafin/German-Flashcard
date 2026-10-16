@@ -90,9 +90,10 @@ h2 {
 /* Image styling */
 img {
     width: 95%;
-    height: 80%;
+    height: 75%;
     object-fit: cover;
     border-radius: 10px;
+    margin-top: 15px;
 }
 
 /* Action Buttons */
