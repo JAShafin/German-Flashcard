@@ -5,8 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>German Vocabulary Flashcards</title>
-    <!-- Cache buster updated to pull the new responsive styles immediately -->
-    <link rel="stylesheet" href="style.css?v=20261018-5" />
+    <!-- Cache buster updated -->
+    <link rel="stylesheet" href="style.css?v=20261018-6" />
 </head>
 
 <body>
@@ -50,32 +50,34 @@
                 </div>
             </div>
 
-            <!-- NEW: Interaction Area (Responsive Layout with Edge Protection) -->
+            <!-- NEW: Interaction Area (Perfectly Centered 3-Column Layout) -->
             <div id="interaction-area"
-                style="display: none; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; margin-bottom: 60px; width: 100%; box-sizing: border-box; padding: 0 15px;">
+                style="display: none; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 20px; margin-bottom: 60px; width: 100%; box-sizing: border-box; padding: 0 10px;">
 
-                <!-- Left: Practice Button -->
-                <button id="btn-practice" onclick="nextWord()"
-                    style="visibility: hidden; padding: 8px 12px; border: 2px solid #888; border-radius: 8px; background-color: #fff; color: #333; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">Practice</button>
-
-                <!-- Center: Gender Stack OR Flip Button -->
-                <div id="center-actions" style="display: flex; flex-direction: row; gap: 6px;">
-                    <!-- Gender Buttons -->
-                    <button id="btn-der" onclick="checkArticle('der')"
-                        style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; cursor: pointer; font-size: 14px; color: #333;">der</button>
-                    <button id="btn-die" onclick="checkArticle('die')"
-                        style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; cursor: pointer; font-size: 14px; color: #333;">die</button>
-                    <button id="btn-das" onclick="checkArticle('das')"
-                        style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; cursor: pointer; font-size: 14px; color: #333;">das</button>
-
-                    <!-- Standard Flip Button -->
-                    <button id="btn-flip" onclick="flipCard()"
-                        style="display: none; padding: 8px 18px; border: 2px solid #888; border-radius: 8px; background-color: #f9f9f9; color: #333; font-weight: bold; cursor: pointer; font-size: 14px;">Flip</button>
+                <!-- Left Column (Practice) -->
+                <div style="flex: 1; display: flex; justify-content: flex-start;">
+                    <button id="btn-practice" onclick="nextWord()"
+                        style="visibility: hidden; padding: 6px 10px; border: 2px solid #888; border-radius: 6px; background-color: #fff; color: #333; font-weight: bold; cursor: pointer; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); white-space: nowrap;">Practice</button>
                 </div>
 
-                <!-- Right: Learned Button -->
-                <button id="btn-learned" onclick="markAsLearned()"
-                    style="visibility: hidden; padding: 8px 12px; border: 2px solid #888; border-radius: 8px; background-color: #fff; color: #333; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">Learned</button>
+                <!-- Center Column (Gender Stack OR Flip) -->
+                <div id="center-actions" style="flex: 0 0 auto; display: flex; flex-direction: row; gap: 6px;">
+                    <button id="btn-der" onclick="checkArticle('der')"
+                        style="padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; cursor: pointer; font-size: 14px; color: #333;">der</button>
+                    <button id="btn-die" onclick="checkArticle('die')"
+                        style="padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; cursor: pointer; font-size: 14px; color: #333;">die</button>
+                    <button id="btn-das" onclick="checkArticle('das')"
+                        style="padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; cursor: pointer; font-size: 14px; color: #333;">das</button>
+
+                    <button id="btn-flip" onclick="flipCard()"
+                        style="display: none; padding: 6px 18px; border: 2px solid #888; border-radius: 6px; background-color: #f9f9f9; color: #333; font-weight: bold; cursor: pointer; font-size: 14px;">Flip</button>
+                </div>
+
+                <!-- Right Column (Learned) -->
+                <div style="flex: 1; display: flex; justify-content: flex-end;">
+                    <button id="btn-learned" onclick="markAsLearned()"
+                        style="visibility: hidden; padding: 6px 10px; border: 2px solid #888; border-radius: 6px; background-color: #fff; color: #333; font-weight: bold; cursor: pointer; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); white-space: nowrap;">Learned</button>
+                </div>
 
             </div>
         </div>
