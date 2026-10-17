@@ -5,14 +5,25 @@ const flashcard = document.getElementById("flashcard");
 const front = document.getElementById("card-front");
 const back = document.getElementById("card-back");
 const image = document.getElementById("image");
-const buttons = document.getElementById("buttons");
 const title = document.getElementById("title");
 const homeButton = document.getElementById("home-button");
+
+// New UI Elements
+const interactionArea = document.getElementById("interaction-area");
+const undoButton = document.getElementById("undo-button");
+const btnDer = document.getElementById("btn-der");
+const btnDie = document.getElementById("btn-die");
+const btnDas = document.getElementById("btn-das");
+const btnPractice = document.getElementById("btn-practice");
+const btnFlip = document.getElementById("btn-flip");
+const btnLearned = document.getElementById("btn-learned");
 
 let words = [];
 let currentIndex = 0;
 let learnedWords = [];
 let currentGroup = "";
+let currentArticle = "";
+let historyStack = [];
 
 // Save username & go to category screen
 function saveUserName() {
@@ -33,7 +44,7 @@ function saveUserName() {
 window.onload = function () {
     userName = localStorage.getItem("userName");
     flashcard.style.display = "none";
-    buttons.style.display = "none";
+    if (interactionArea) interactionArea.style.display = "none";
 
     if (userName) {
         namePrompt.style.display = "none";
@@ -103,74 +114,86 @@ function startFlashcards(selectedGroup) {
     currentGroup = selectedGroup;
     currentIndex = 0;
     learnedWords = JSON.parse(localStorage.getItem(currentGroup)) || [];
+    historyStack = [];
 
     flashcard.classList.remove("flipped");
-
     flashcard.style.display = "block";
-    buttons.style.display = "block";
+
+    // Show the interaction row
+    interactionArea.style.display = "flex";
     groupButtons.style.display = "none";
     title.style.display = "none";
     homeButton.style.display = "block";
+    undoButton.style.display = "none";
 
-    // HIDE THE TABS WHILE STUDYING
     document.getElementById("tab-nav").style.display = "none";
 
     loadWord();
 }
 
 function loadWord() {
-    // 1. Check if EVERY SINGLE WORD is actually learned
     if (learnedWords.length >= words.length || words.length === 0) {
         front.innerText = "🎉 All done!";
         back.innerHTML = "";
         image.src = "";
+        interactionArea.style.display = "none";
         return;
     }
 
-    // 2. Safety catch: if the index went out of bounds, bring it back to 0
-    if (currentIndex >= words.length) {
-        currentIndex = 0;
-    }
-
-    // 3. Find the next unlearned word, looping back to 0 if necessary
+    if (currentIndex >= words.length) currentIndex = 0;
     while (learnedWords.includes(currentIndex)) {
         currentIndex++;
-        if (currentIndex >= words.length) {
-            currentIndex = 0;
-        }
+        if (currentIndex >= words.length) currentIndex = 0;
     }
+
+    // Reset UI for the new card
+    btnDer.style.backgroundColor = "#fff"; btnDer.style.color = "#333";
+    btnDie.style.backgroundColor = "#fff"; btnDie.style.color = "#333";
+    btnDas.style.backgroundColor = "#fff"; btnDas.style.color = "#333";
 
     const word = words[currentIndex];
-
-    // Separate the article from the noun
     let frontText = word.german;
     let cardColor = "inherit";
+    currentArticle = "";
 
     const parts = word.german.split(" ");
+
+    // Check if it's a noun with der/die/das
     if (parts.length > 1 && ["der", "die", "das"].includes(parts[0].toLowerCase())) {
-        const article = parts[0].toLowerCase();
+        currentArticle = parts[0].toLowerCase();
         const noun = parts.slice(1).join(" ");
+        frontText = noun;
 
-        frontText = noun; // Hide article on the front
+        if (currentArticle === "der") cardColor = "#1976d2";
+        else if (currentArticle === "die") cardColor = "#e91e63";
+        else if (currentArticle === "das") cardColor = "#388e3c";
 
-        // Determine the color for the ENTIRE text
-        if (article === "der") cardColor = "#1976d2"; // Blue
-        else if (article === "die") cardColor = "#e91e63"; // Pink
-        else if (article === "das") cardColor = "#388e3c"; // Green
+        // Show Genders in middle, but HIDE Practice/Learned on the sides initially
+        btnDer.style.display = "inline-block";
+        btnDie.style.display = "inline-block";
+        btnDas.style.display = "inline-block";
+        btnFlip.style.display = "none";
+
+        btnPractice.style.visibility = "hidden";
+        btnLearned.style.visibility = "hidden";
+    } else {
+        // Not a noun - Hide genders, show Flip in middle, reveal side buttons
+        btnDer.style.display = "none";
+        btnDie.style.display = "none";
+        btnDas.style.display = "none";
+        btnFlip.style.display = "inline-block";
+
+        btnPractice.style.visibility = "visible";
+        btnLearned.style.visibility = "visible";
     }
 
-    // Display the texts - Applying the color to the whole paragraph!
     front.innerText = frontText;
     back.innerHTML = `<p style="color: ${cardColor};"><strong>${word.german}</strong> = ${word.english}</p><img id="image" src="" alt="word image">`;
 
-    // Speak ONLY the noun on the front
     speak(frontText);
 
-    // Fetch the image
     fetch(`https://api.pexels.com/v1/search?query=${word.english}&per_page=1`, {
-        headers: {
-            Authorization: 'bXRrCdI0rYHuzI8RossKeXHIryc6Hupp2wVMEyuDFXOsyRJiB5c8BMlp'
-        }
+        headers: { Authorization: 'bXRrCdI0rYHuzI8RossKeXHIryc6Hupp2wVMEyuDFXOsyRJiB5c8BMlp' }
     })
         .then(response => response.json())
         .then(data => {
@@ -182,24 +205,68 @@ function loadWord() {
         });
 }
 
+function checkArticle(guess) {
+    // Grey out the clicked button
+    const clickedBtn = document.getElementById(`btn-${guess}`);
+    clickedBtn.style.backgroundColor = "#f0f0f0";
+    clickedBtn.style.color = "#9e9e9e";
+
+    // Auto-flip
+    flashcard.classList.add("flipped");
+
+    // Now that they guessed, reveal BOTH Practice and Learned!
+    btnPractice.style.visibility = "visible";
+    btnLearned.style.visibility = "visible";
+
+    const word = words[currentIndex];
+    speak(`${word.german}. It means: ${word.english}`);
+}
+
 function flipCard() {
     flashcard.classList.toggle("flipped");
     const word = words[currentIndex];
-
-    // Now that the card is flipped, speak the FULL word with the article
     speak(`${word.german}. It means: ${word.english}`);
 }
 
 function markAsLearned() {
+    historyStack.push({ index: currentIndex, wasLearned: true });
+    undoButton.style.display = "flex";
+
     if (!learnedWords.includes(currentIndex)) {
         learnedWords.push(currentIndex);
         localStorage.setItem(currentGroup, JSON.stringify(learnedWords));
     }
     currentIndex++;
-    // Loop back to the beginning if we pass the last word
-    if (currentIndex >= words.length) {
-        currentIndex = 0;
+    if (currentIndex >= words.length) currentIndex = 0;
+    flashcard.classList.remove("flipped");
+    loadWord();
+}
+
+function nextWord() {
+    historyStack.push({ index: currentIndex, wasLearned: false });
+    undoButton.style.display = "flex";
+
+    currentIndex++;
+    if (currentIndex >= words.length) currentIndex = 0;
+    flashcard.classList.remove("flipped");
+    loadWord();
+}
+
+function undoLastAction() {
+    if (historyStack.length === 0) return;
+
+    const lastAction = historyStack.pop();
+    currentIndex = lastAction.index;
+
+    if (lastAction.wasLearned) {
+        learnedWords = learnedWords.filter(idx => idx !== currentIndex);
+        localStorage.setItem(currentGroup, JSON.stringify(learnedWords));
     }
+
+    if (historyStack.length === 0) {
+        undoButton.style.display = "none";
+    }
+
     flashcard.classList.remove("flipped");
     loadWord();
 }
@@ -207,24 +274,13 @@ function markAsLearned() {
 function goHome() {
     flashcard.classList.remove("flipped");
     flashcard.style.display = "none";
-    buttons.style.display = "none";
+    interactionArea.style.display = "none";
     title.style.display = "block";
     homeButton.style.display = "none";
+    undoButton.style.display = "none";
 
-    // SHOW THE TABS AGAIN WHEN RETURNING HOME
     document.getElementById("tab-nav").style.display = "flex";
-
     showGroupButtons();
-}
-
-function nextWord() {
-    currentIndex++;
-    // Loop back to the beginning if we pass the last word
-    if (currentIndex >= words.length) {
-        currentIndex = 0;
-    }
-    flashcard.classList.remove("flipped");
-    loadWord();
 }
 
 function speak(text) {
@@ -240,6 +296,7 @@ function speak(text) {
 
 function switchTab(tab) {
     flashcard.classList.remove("flipped");
+    undoButton.style.display = "none";
 
     const flashcardsSection = document.getElementById("flashcards-section");
     const grammarSection = document.getElementById("grammar-section");
