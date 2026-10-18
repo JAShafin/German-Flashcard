@@ -5,8 +5,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>German Vocabulary Flashcards</title>
-    <!-- Cache buster updated -->
-    <link rel="stylesheet" href="style.css?v=20261018-6" />
+    <!-- Cache buster updated to pull the new styles immediately -->
+    <link rel="stylesheet" href="style.css?v=20261018-7" />
+
+    <!-- FIX MOBILE SPACING: Makes the card wider on phones -->
+    <style>
+        @media (max-width: 600px) {
+            .container {
+                width: 96% !important;
+                max-width: 100% !important;
+                padding: 10px !important;
+                margin: 10px auto !important;
+            }
+
+            #interaction-area {
+                padding: 0 2px !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -122,7 +138,7 @@
 
     <!-- JavaScript -->
     <script src="words.js"></script>
-    <script src="script.js?v=20261018-2"></script>
+    <script src="script.js?v=20261018-7"></script>
     <script src="extra-grammar.js?v=3"></script>
     <script src="grammar.js?v=20261001-4"></script>
     <script src="dative-game.js"></script>

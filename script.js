@@ -211,12 +211,18 @@ function checkArticle(guess) {
     clickedBtn.style.backgroundColor = "#f0f0f0";
     clickedBtn.style.color = "#9e9e9e";
 
-    // Auto-flip
+    // Auto-flip the card
     flashcard.classList.add("flipped");
 
-    // Now that they guessed, reveal BOTH Practice and Learned!
+    // ALWAYS reveal the Practice button so they can move forward
     btnPractice.style.visibility = "visible";
-    btnLearned.style.visibility = "visible";
+
+    // THE RULE: If correct, reveal Learned. If wrong, keep it hidden!
+    if (guess === currentArticle) {
+        btnLearned.style.visibility = "visible";
+    } else {
+        btnLearned.style.visibility = "hidden"; // Forces them to click Practice
+    }
 
     const word = words[currentIndex];
     speak(`${word.german}. It means: ${word.english}`);
