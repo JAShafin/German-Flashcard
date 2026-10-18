@@ -3,23 +3,32 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- STRICT VIEWPORT: Prevents zooming so the back button never gets cut off -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>German Vocabulary Flashcards</title>
-    <!-- Cache buster updated to pull the new styles immediately -->
-    <link rel="stylesheet" href="style.css?v=20261018-7" />
+    <link rel="stylesheet" href="style.css?v=20261018-8" />
 
-    <!-- FIX MOBILE SPACING: Makes the card wider on phones -->
+    <!-- MOBILE CSS: Removes wasted space and stretches the card -->
     <style>
         @media (max-width: 600px) {
-            .container {
-                width: 96% !important;
-                max-width: 100% !important;
-                padding: 10px !important;
-                margin: 10px auto !important;
+            body {
+                margin: 0;
+                padding: 0;
             }
 
-            #interaction-area {
-                padding: 0 2px !important;
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 10px !important;
+                margin: 0 !important;
+                box-sizing: border-box !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+            }
+
+            .flashcard {
+                width: 100% !important;
+                box-sizing: border-box !important;
             }
         }
     </style>
@@ -66,34 +75,29 @@
                 </div>
             </div>
 
-            <!-- NEW: Interaction Area (Perfectly Centered 3-Column Layout) -->
+            <!-- NEW: Interaction Area (Tightly Packed Single Row) -->
             <div id="interaction-area"
-                style="display: none; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 20px; margin-bottom: 60px; width: 100%; box-sizing: border-box; padding: 0 10px;">
+                style="display: none; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin-top: 15px; margin-bottom: 60px; width: 100%;">
 
-                <!-- Left Column (Practice) -->
-                <div style="flex: 1; display: flex; justify-content: flex-start;">
-                    <button id="btn-practice" onclick="nextWord()"
-                        style="visibility: hidden; padding: 6px 10px; border: 2px solid #888; border-radius: 6px; background-color: #fff; color: #333; font-weight: bold; cursor: pointer; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); white-space: nowrap;">Practice</button>
-                </div>
+                <!-- Practice Button -->
+                <button id="btn-practice" onclick="nextWord()"
+                    style="visibility: hidden; padding: 6px 12px; border: 2px solid #555; border-radius: 6px; background-color: #fff; color: #333; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">Practice</button>
 
-                <!-- Center Column (Gender Stack OR Flip) -->
-                <div id="center-actions" style="flex: 0 0 auto; display: flex; flex-direction: row; gap: 6px;">
-                    <button id="btn-der" onclick="checkArticle('der')"
-                        style="padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; cursor: pointer; font-size: 14px; color: #333;">der</button>
-                    <button id="btn-die" onclick="checkArticle('die')"
-                        style="padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; cursor: pointer; font-size: 14px; color: #333;">die</button>
-                    <button id="btn-das" onclick="checkArticle('das')"
-                        style="padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; cursor: pointer; font-size: 14px; color: #333;">das</button>
+                <!-- Gender Buttons -->
+                <button id="btn-der" onclick="checkArticle('der')"
+                    style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; cursor: pointer; font-size: 14px; color: #333;">der</button>
+                <button id="btn-die" onclick="checkArticle('die')"
+                    style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; cursor: pointer; font-size: 14px; color: #333;">die</button>
+                <button id="btn-das" onclick="checkArticle('das')"
+                    style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; cursor: pointer; font-size: 14px; color: #333;">das</button>
 
-                    <button id="btn-flip" onclick="flipCard()"
-                        style="display: none; padding: 6px 18px; border: 2px solid #888; border-radius: 6px; background-color: #f9f9f9; color: #333; font-weight: bold; cursor: pointer; font-size: 14px;">Flip</button>
-                </div>
+                <!-- Flip Button (Only shows if no der/die/das needed) -->
+                <button id="btn-flip" onclick="flipCard()"
+                    style="display: none; padding: 6px 18px; border: 2px solid #555; border-radius: 6px; background-color: #f9f9f9; color: #333; font-weight: bold; cursor: pointer; font-size: 14px;">Flip</button>
 
-                <!-- Right Column (Learned) -->
-                <div style="flex: 1; display: flex; justify-content: flex-end;">
-                    <button id="btn-learned" onclick="markAsLearned()"
-                        style="visibility: hidden; padding: 6px 10px; border: 2px solid #888; border-radius: 6px; background-color: #fff; color: #333; font-weight: bold; cursor: pointer; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); white-space: nowrap;">Learned</button>
-                </div>
+                <!-- Learned Button -->
+                <button id="btn-learned" onclick="markAsLearned()"
+                    style="visibility: hidden; padding: 6px 12px; border: 2px solid #555; border-radius: 6px; background-color: #fff; color: #333; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">Learned</button>
 
             </div>
         </div>
@@ -132,13 +136,13 @@
         </div>
     </div>
 
-    <!-- Undo Button -->
+    <!-- Undo Button (Moved slightly higher to ensure it never clips on mobile) -->
     <button id="undo-button" onclick="undoLastAction()"
-        style="display: none; position: fixed; bottom: 20px; left: 20px; font-size: 24px; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; background: #fff; border: 2px solid #ccc; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; padding: 0; align-items: center; justify-content: center;">↩</button>
+        style="display: none; position: fixed; bottom: 30px; left: 15px; font-size: 24px; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; background: #fff; border: 2px solid #ccc; box-shadow: 0 4px 6px rgba(0,0,0,0.2); z-index: 1000; padding: 0; align-items: center; justify-content: center;">↩</button>
 
     <!-- JavaScript -->
     <script src="words.js"></script>
-    <script src="script.js?v=20261018-7"></script>
+    <script src="script.js?v=20261018-8"></script>
     <script src="extra-grammar.js?v=3"></script>
     <script src="grammar.js?v=20261001-4"></script>
     <script src="dative-game.js"></script>
