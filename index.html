@@ -6,9 +6,9 @@
     <!-- STRICT VIEWPORT: Prevents zooming so the back button never gets cut off -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>German Vocabulary Flashcards</title>
-    <link rel="stylesheet" href="style.css?v=20261018-8" />
+    <link rel="stylesheet" href="style.css?v=20261018-9" />
 
-    <!-- MOBILE CSS: Removes wasted space and stretches the card -->
+    <!-- MOBILE CSS: Maximizes card size by stripping away edge padding -->
     <style>
         @media (max-width: 600px) {
             body {
@@ -19,16 +19,29 @@
             .container {
                 width: 100% !important;
                 max-width: 100% !important;
-                padding: 10px !important;
+                padding: 4px !important;
+                /* Reduced to absolute minimum */
                 margin: 0 !important;
                 box-sizing: border-box !important;
                 border-radius: 0 !important;
                 box-shadow: none !important;
             }
 
+            #flashcard-container {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
             .flashcard {
                 width: 100% !important;
+                margin: 0 !important;
                 box-sizing: border-box !important;
+            }
+
+            #interaction-area {
+                gap: 5px !important;
+                /* Tighter gap so buttons always fit */
             }
         }
     </style>
@@ -136,7 +149,7 @@
         </div>
     </div>
 
-    <!-- Undo Button (Moved slightly higher to ensure it never clips on mobile) -->
+    <!-- Undo Button -->
     <button id="undo-button" onclick="undoLastAction()"
         style="display: none; position: fixed; bottom: 30px; left: 15px; font-size: 24px; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; background: #fff; border: 2px solid #ccc; box-shadow: 0 4px 6px rgba(0,0,0,0.2); z-index: 1000; padding: 0; align-items: center; justify-content: center;">↩</button>
 
