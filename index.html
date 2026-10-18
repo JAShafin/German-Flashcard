@@ -6,35 +6,38 @@
     <!-- STRICT VIEWPORT: Prevents zooming so the back button never gets cut off -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>German Vocabulary Flashcards</title>
-    <link rel="stylesheet" href="style.css?v=20261018-9" />
+    <link rel="stylesheet" href="style.css?v=20261018-10" />
 
-    <!-- MOBILE CSS: Maximizes card size by stripping away edge padding -->
+    <!-- MOBILE CSS: Fixes top clash and minimizes side spaces -->
     <style>
         @media (max-width: 600px) {
             body {
-                margin: 0;
-                padding: 0;
+                margin: 0 !important;
+                /* This 6px is the ONLY space that will exist on the left and right */
+                padding: 0 6px !important;
+                box-sizing: border-box !important;
             }
 
             .container {
                 width: 100% !important;
                 max-width: 100% !important;
-                padding: 4px !important;
-                /* Reduced to absolute minimum */
+                padding: 5px !important;
                 margin: 0 !important;
                 box-sizing: border-box !important;
-                border-radius: 0 !important;
                 box-shadow: none !important;
             }
 
             #flashcard-container {
                 width: 100% !important;
-                margin: 0 !important;
+                /* Pushes the card down away from the Home button and text */
+                margin: 25px 0 0 0 !important;
                 padding: 0 !important;
             }
 
             .flashcard {
                 width: 100% !important;
+                /* Overrides any old restrictions in style.css */
+                max-width: 100% !important;
                 margin: 0 !important;
                 box-sizing: border-box !important;
             }
@@ -88,7 +91,7 @@
                 </div>
             </div>
 
-            <!-- NEW: Interaction Area (Tightly Packed Single Row) -->
+            <!-- Interaction Area (Tightly Packed Single Row) -->
             <div id="interaction-area"
                 style="display: none; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin-top: 15px; margin-bottom: 60px; width: 100%;">
 
