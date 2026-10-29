@@ -186,36 +186,12 @@
                 </div>
 
                 <h4 style="margin-top:20px; color:#555;">Perfect Form</h4>
-                <div class="grammar-topic-list">
-                    <button class="grammar-topic-card verb-menu-btn"
-                        onclick="startVerbFlashcards('perfectForms', 'mixed')"><span><strong>Mixed
-                                Verbs</strong></span><span class="topic-arrow">→</span></button>
-                    <button class="grammar-topic-card verb-menu-btn"
-                        onclick="startVerbFlashcards('perfectForms', 'a1')"><span><strong>A1 Irregular
-                                Verbs</strong></span><span class="topic-arrow">→</span></button>
-                    <button class="grammar-topic-card verb-menu-btn"
-                        onclick="startVerbFlashcards('perfectForms', 'a2')"><span><strong>A2 Irregular
-                                Verbs</strong></span><span class="topic-arrow">→</span></button>
-                    <button class="grammar-topic-card verb-menu-btn"
-                        onclick="startVerbFlashcards('perfectForms', 'b1')"><span><strong>B1 Irregular
-                                Verbs</strong></span><span class="topic-arrow">→</span></button>
-                    <button class="grammar-topic-card verb-menu-btn"
-                        onclick="startVerbFlashcards('perfectForms', 'b2')"><span><strong>B2 Irregular
-                                Verbs</strong></span><span class="topic-arrow">→</span></button>
-                </div>
+                <!-- Dynamic List Rendered by JS -->
+                <div id="verb-perfect-list"></div>
 
                 <h4 style="margin-top:20px; color:#555;">Conjugation Shifts (du / er, sie, es)</h4>
-                <div class="grammar-topic-list">
-                    <button class="grammar-topic-card verb-menu-btn"
-                        onclick="startVerbFlashcards('conjugationForms', 'shift_a_to_ae')"><span><strong>Shift: a →
-                                ä</strong></span><span class="topic-arrow">→</span></button>
-                    <button class="grammar-topic-card verb-menu-btn"
-                        onclick="startVerbFlashcards('conjugationForms', 'shift_e_to_i')"><span><strong>Shift: e →
-                                i</strong></span><span class="topic-arrow">→</span></button>
-                    <button class="grammar-topic-card verb-menu-btn"
-                        onclick="startVerbFlashcards('conjugationForms', 'shift_e_to_ie')"><span><strong>Shift: e →
-                                ie</strong></span><span class="topic-arrow">→</span></button>
-                </div>
+                <!-- Dynamic List Rendered by JS -->
+                <div id="verb-conjugation-list"></div>
             </div>
 
             <div id="verb-flashcard-area" style="display: none;">
@@ -228,18 +204,21 @@
                     </div>
                 </div>
 
+                <!-- Updated Middle Buttons -->
                 <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+                    <button id="verb-btn-practice" onclick="practiceVerbCard()"
+                        style="display: none; padding: 8px 20px; border: 2px solid #555; border-radius: 6px; background-color: #fff; cursor: pointer; font-weight: bold;">Practice</button>
                     <button id="verb-btn-flip" onclick="flipVerbCard()"
                         style="padding: 8px 20px; border: 2px solid #555; border-radius: 6px; background-color: #f9f9f9; cursor: pointer; font-weight: bold;">Flip</button>
-                    <button id="verb-btn-next" onclick="nextVerbCard()"
-                        style="display: none; padding: 8px 20px; border: 2px solid #555; border-radius: 6px; background-color: #fff; cursor: pointer; font-weight: bold;">Next</button>
+                    <button id="verb-btn-learned" onclick="markVerbLearned()"
+                        style="display: none; padding: 8px 20px; border: 2px solid #555; border-radius: 6px; background-color: #fff; cursor: pointer; font-weight: bold;">Learned</button>
                 </div>
 
                 <!-- Bottom row: Back button & Progress -->
                 <div
                     style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; padding: 0 10px;">
-                    <button onclick="prevVerbCard()"
-                        style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer;">←
+                    <button id="verb-btn-back" onclick="prevVerbCard()"
+                        style="visibility: hidden; padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer;">←
                         Back</button>
                     <div id="verb-progress" style="font-weight: bold; color: #555;">0 / 0</div>
                 </div>

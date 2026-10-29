@@ -87,15 +87,14 @@ const verbData = {
             { verb: "leiden", meaning: "to suffer", form: "hat gelitten" },
             { verb: "schweigen", meaning: "to remain silent", form: "hat geschwiegen" },
             { verb: "streichen", meaning: "to cancel / paint", form: "hat gestrichen" },
-            { verb: "wiegen", meaning: "to weigh", form: "hat gewogen" },
+            { verb: "wiegen", meaning: "to weigh", form: "hat gewogen" }
+        ],
+        b2: [
             { verb: "binden", meaning: "to bind/tie", form: "hat gebunden" },
             { verb: "schaffen", meaning: "to create (strong)", form: "hat geschaffen" },
             { verb: "stoßen", meaning: "to bump/encounter", form: "ist/hat gestoßen" },
             { verb: "fliehen", meaning: "to flee / escape", form: "ist geflohen" },
-            { verb: "biegen", meaning: "to bend/turn", form: "hat/ist gebogen" }
-        ],
-        b2: [
-
+            { verb: "biegen", meaning: "to bend/turn", form: "hat/ist gebogen" },
             { verb: "zwingen", meaning: "to force", form: "hat gezwungen" },
             { verb: "streiten", meaning: "to argue", form: "hat gestritten" },
             { verb: "sterben", meaning: "to die", form: "ist gestorben" },
@@ -164,32 +163,124 @@ const verbData = {
 };
 
 // ==========================================
-// VERB MASTERY LOGIC
+// DYNAMIC MENU GENERATION
 // ==========================================
-let currentVerbList = [];
-let currentVerbIndex = 0;
+const verbMenuConfig = {
+    perfectForms: [
+        { id: "mixed", label: "Mixed Verbs" },
+        { id: "a1", label: "A1 Irregular Verbs" },
+        { id: "a2", label: "A2 Irregular Verbs" },
+        { id: "b1", label: "B1 Irregular Verbs" },
+        { id: "b2", label: "B2 Irregular Verbs" }
+    ],
+    conjugationForms: [
+        { id: "shift_a_to_ae", label: "Shift: a → ä" },
+        { id: "shift_e_to_i", label: "Shift: e → i" },
+        { id: "shift_e_to_ie", label: "Shift: e → ie" }
+    ]
+};
 
 function openVerbMenu() {
-    // Hide standard grammar home, show verb menu
     document.getElementById("grammar-home").style.display = "none";
     document.getElementById("verb-section-home").style.display = "block";
     document.getElementById("verb-flashcard-area").style.display = "none";
+    renderVerbMenu();
 }
 
 function closeVerbMenu() {
-    // Go back to standard grammar lab
     document.getElementById("verb-section-home").style.display = "none";
     document.getElementById("grammar-home").style.display = "block";
 }
 
-function startVerbFlashcards(mainCategory, subCategory) {
-    currentVerbList = verbData[mainCategory][subCategory];
-    currentVerbIndex = 0;
+function renderVerbMenu() {
+    renderVerbCategory("perfectForms", "verb-perfect-list");
+    renderVerbCategory("conjugationForms", "verb-conjugation-list");
+}
+
+function renderVerbCategory(mainCat, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = "";
+
+    verbMenuConfig[mainCat].forEach(subCat => {
+        const list = verbData[mainCat][subCat.id];
+        const total = list.length;
+        const storageKey = `verbProgress_${mainCat}_${subCat.id}`;
+        const learned = JSON.parse(localStorage.getItem(storageKey)) || [];
+        const progress = learned.length;
+
+        let btnLabel = `${subCat.label} (${total})`;
+        if (progress === total && total > 0) {
+            btnLabel += " ✅";
+        } else if (progress > 0) {
+            btnLabel += ` - ${Math.floor((progress / total) * 100)}%`;
+        }
+
+        const wrapper = document.createElement("div");
+        wrapper.style.display = "flex";
+        wrapper.style.justifyContent = "space-between";
+        wrapper.style.alignItems = "center";
+        wrapper.style.marginBottom = "10px";
+        wrapper.style.width = "100%";
+
+        const button = document.createElement("button");
+        button.className = "grammar-topic-card verb-menu-btn";
+        button.onclick = () => startVerbFlashcards(mainCat, subCat.id);
+        button.innerHTML = `<span><strong>${btnLabel}</strong></span><span class="topic-arrow">→</span>`;
+        button.style.flexGrow = "1";
+        button.style.marginRight = "10px";
+
+        const resetBtn = document.createElement("button");
+        resetBtn.innerHTML = "🔁";
+        resetBtn.title = "Reset progress";
+        resetBtn.style.border = "none";
+        resetBtn.style.background = "transparent";
+        resetBtn.style.cursor = "pointer";
+        resetBtn.style.fontSize = "18px";
+        resetBtn.onclick = () => {
+            localStorage.removeItem(storageKey);
+            renderVerbMenu(); // Re-draw menu instantly
+        };
+
+        wrapper.appendChild(button);
+        wrapper.appendChild(resetBtn);
+        container.appendChild(wrapper);
+    });
+}
+
+// ==========================================
+// VERB MASTERY LOGIC (Practice / Learned / Undo)
+// ==========================================
+let currentVerbList = [];
+let currentVerbStorageKey = "";
+let verbLearnedIndices = [];
+let verbHistory = [];
+let activeVerbIndex = 0;
+
+function startVerbFlashcards(mainCat, subCat) {
+    currentVerbList = verbData[mainCat][subCat];
+    currentVerbStorageKey = `verbProgress_${mainCat}_${subCat}`;
+    verbLearnedIndices = JSON.parse(localStorage.getItem(currentVerbStorageKey)) || [];
+    verbHistory = [];
+    activeVerbIndex = 0;
 
     document.getElementById("verb-section-home").style.display = "none";
     document.getElementById("verb-flashcard-area").style.display = "block";
 
+    findNextUnlearnedVerb();
     loadVerbCard();
+}
+
+function findNextUnlearnedVerb() {
+    // If everything is learned, set index to -1 so we can show "All done"
+    if (verbLearnedIndices.length >= currentVerbList.length) {
+        activeVerbIndex = -1;
+        return;
+    }
+    // Skip words that are already in the learned array
+    while (verbLearnedIndices.includes(activeVerbIndex)) {
+        activeVerbIndex++;
+        if (activeVerbIndex >= currentVerbList.length) activeVerbIndex = 0;
+    }
 }
 
 function loadVerbCard() {
@@ -197,42 +288,87 @@ function loadVerbCard() {
     const front = document.getElementById("verb-front");
     const back = document.getElementById("verb-back");
     const progress = document.getElementById("verb-progress");
-    const btnNext = document.getElementById("verb-btn-next");
+
+    const btnPractice = document.getElementById("verb-btn-practice");
+    const btnLearned = document.getElementById("verb-btn-learned");
     const btnFlip = document.getElementById("verb-btn-flip");
+    const btnBack = document.getElementById("verb-btn-back");
 
     card.classList.remove("flipped");
-    btnNext.style.display = "none";
-    btnFlip.style.display = "inline-block";
+    btnPractice.style.display = "none";
+    btnLearned.style.display = "none";
 
-    const word = currentVerbList[currentVerbIndex];
+    // Manage Back Button visibility
+    if (verbHistory.length > 0) {
+        btnBack.style.visibility = "visible";
+    } else {
+        btnBack.style.visibility = "hidden";
+    }
+
+    if (activeVerbIndex === -1 || verbLearnedIndices.length >= currentVerbList.length) {
+        front.innerHTML = `<h3>🎉 All done!</h3>`;
+        back.innerHTML = "";
+        btnFlip.style.display = "none";
+        progress.innerText = `${currentVerbList.length} / ${currentVerbList.length}`;
+        return;
+    }
+
+    btnFlip.style.display = "inline-block";
+    const word = currentVerbList[activeVerbIndex];
 
     front.innerHTML = `<h3>${word.verb}</h3>`;
     back.innerHTML = `<p style="color: #666; margin-bottom:10px;">${word.meaning}</p>
                       <h3 style="color: #d32f2f;">${word.form}</h3>`;
 
-    progress.innerText = `${currentVerbIndex + 1} / ${currentVerbList.length}`;
+    progress.innerText = `${verbLearnedIndices.length} / ${currentVerbList.length}`;
 }
 
 function flipVerbCard() {
     document.getElementById("verb-card").classList.add("flipped");
     document.getElementById("verb-btn-flip").style.display = "none";
-    document.getElementById("verb-btn-next").style.display = "inline-block";
+
+    // Reveal Practice (Left) and Learned (Right)
+    document.getElementById("verb-btn-practice").style.display = "inline-block";
+    document.getElementById("verb-btn-learned").style.display = "inline-block";
 }
 
-function nextVerbCard() {
-    if (currentVerbIndex < currentVerbList.length - 1) {
-        currentVerbIndex++;
-        loadVerbCard();
-    } else {
-        // Finished the list
-        document.getElementById("verb-front").innerHTML = `<h3>🎉 All done!</h3>`;
-        document.getElementById("verb-btn-next").style.display = "none";
+function practiceVerbCard() {
+    // Record history but do NOT add to learned list
+    verbHistory.push({ index: activeVerbIndex, learned: false });
+
+    activeVerbIndex++;
+    if (activeVerbIndex >= currentVerbList.length) activeVerbIndex = 0;
+    findNextUnlearnedVerb();
+    loadVerbCard();
+}
+
+function markVerbLearned() {
+    // Record history and ADD to learned list
+    verbHistory.push({ index: activeVerbIndex, learned: true });
+
+    if (!verbLearnedIndices.includes(activeVerbIndex)) {
+        verbLearnedIndices.push(activeVerbIndex);
+        localStorage.setItem(currentVerbStorageKey, JSON.stringify(verbLearnedIndices));
     }
+
+    activeVerbIndex++;
+    if (activeVerbIndex >= currentVerbList.length) activeVerbIndex = 0;
+    findNextUnlearnedVerb();
+    loadVerbCard();
 }
 
 function prevVerbCard() {
-    if (currentVerbIndex > 0) {
-        currentVerbIndex--;
-        loadVerbCard();
+    if (verbHistory.length === 0) return;
+
+    // Pop the last card off the history stack
+    const lastAction = verbHistory.pop();
+    activeVerbIndex = lastAction.index;
+
+    // If it was marked as learned, un-learn it!
+    if (lastAction.learned) {
+        verbLearnedIndices = verbLearnedIndices.filter(idx => idx !== activeVerbIndex);
+        localStorage.setItem(currentVerbStorageKey, JSON.stringify(verbLearnedIndices));
     }
+
+    loadVerbCard();
 }
