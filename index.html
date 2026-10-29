@@ -8,12 +8,19 @@
     <title>German Vocabulary Flashcards</title>
     <link rel="stylesheet" href="style.css?v=20261018-10" />
 
-    <!-- MOBILE CSS: Fixes top clash and minimizes side spaces -->
     <style>
+        /* Fixes the Home button clash: Makes it scroll away with the page instead of floating permanently */
+        #home-button {
+            position: absolute !important;
+            top: 15px;
+            left: 15px;
+            z-index: 1000;
+        }
+
+        /* MOBILE CSS: Fixes top clash and minimizes side spaces */
         @media (max-width: 600px) {
             body {
                 margin: 0 !important;
-                /* This 6px is the ONLY space that will exist on the left and right */
                 padding: 0 6px !important;
                 box-sizing: border-box !important;
             }
@@ -29,14 +36,12 @@
 
             #flashcard-container {
                 width: 100% !important;
-                /* Pushes the card down away from the Home button and text */
                 margin: 25px 0 0 0 !important;
                 padding: 0 !important;
             }
 
             .flashcard {
                 width: 100% !important;
-                /* Overrides any old restrictions in style.css */
                 max-width: 100% !important;
                 margin: 0 !important;
                 box-sizing: border-box !important;
@@ -44,7 +49,6 @@
 
             #interaction-area {
                 gap: 5px !important;
-                /* Tighter gap so buttons always fit */
             }
         }
     </style>
@@ -52,7 +56,7 @@
 
 <body>
 
-    <!-- Home Button (top-left) -->
+    <!-- Restored Original Home Button -->
     <button id="home-button" onclick="goHome()" style="display: none;">Home</button>
 
     <div class="container">
@@ -86,14 +90,15 @@
                     <div class="front" id="card-front">Word</div>
                     <div class="back" id="card-back">
                         <p><strong>Word</strong> = Meaning</p>
-                        <img id="image" src="" alt="word image" />
+                        <!-- Image hidden by default until successfully loaded -->
+                        <img id="image" src="" alt="word image" style="display: none;" />
                     </div>
                 </div>
             </div>
 
-            <!-- Interaction Area (Tightly Packed Single Row) -->
+            <!-- Interaction Area -->
             <div id="interaction-area"
-                style="display: none; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin-top: 15px; margin-bottom: 60px; width: 100%;">
+                style="display: none; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin-top: 15px; margin-bottom: 20px; width: 100%;">
 
                 <!-- Practice Button -->
                 <button id="btn-practice" onclick="nextWord()"
@@ -107,7 +112,7 @@
                 <button id="btn-das" onclick="checkArticle('das')"
                     style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; cursor: pointer; font-size: 14px; color: #333;">das</button>
 
-                <!-- Flip Button (Only shows if no der/die/das needed) -->
+                <!-- Flip Button -->
                 <button id="btn-flip" onclick="flipCard()"
                     style="display: none; padding: 6px 18px; border: 2px solid #555; border-radius: 6px; background-color: #f9f9f9; color: #333; font-weight: bold; cursor: pointer; font-size: 14px;">Flip</button>
 
@@ -116,6 +121,13 @@
                     style="visibility: hidden; padding: 6px 12px; border: 2px solid #555; border-radius: 6px; background-color: #fff; color: #333; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">Learned</button>
 
             </div>
+
+            <!-- Progress Counter (Moved to the very bottom, after all the buttons) -->
+            <div id="progress-counter"
+                style="display: none; text-align: center; font-weight: bold; color: #555; margin-bottom: 60px; font-size: 16px;">
+                0 / 0 Learned
+            </div>
+
         </div>
 
         <!-- ===== GRAMMAR LAB ===== -->

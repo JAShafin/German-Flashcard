@@ -17,6 +17,7 @@ const btnDas = document.getElementById("btn-das");
 const btnPractice = document.getElementById("btn-practice");
 const btnFlip = document.getElementById("btn-flip");
 const btnLearned = document.getElementById("btn-learned");
+const progressCounter = document.getElementById("progress-counter");
 
 let words = [];
 let currentIndex = 0;
@@ -109,6 +110,12 @@ function showGroupButtons() {
     });
 }
 
+function updateProgress() {
+    if (words && words.length > 0) {
+        progressCounter.innerText = `${learnedWords.length} / ${words.length} Learned`;
+    }
+}
+
 function startFlashcards(selectedGroup) {
     words = wordGroups[selectedGroup];
     currentGroup = selectedGroup;
@@ -125,9 +132,11 @@ function startFlashcards(selectedGroup) {
     title.style.display = "none";
     homeButton.style.display = "block";
     undoButton.style.display = "none";
+    progressCounter.style.display = "block";
 
     document.getElementById("tab-nav").style.display = "none";
 
+    updateProgress();
     loadWord();
 }
 
@@ -135,7 +144,7 @@ function loadWord() {
     if (learnedWords.length >= words.length || words.length === 0) {
         front.innerText = "🎉 All done!";
         back.innerHTML = "";
-        image.src = "";
+        image.style.display = "none";
         interactionArea.style.display = "none";
         return;
     }
@@ -188,40 +197,44 @@ function loadWord() {
     }
 
     front.innerText = frontText;
-    back.innerHTML = `<p style="color: ${cardColor};"><strong>${word.german}</strong> = ${word.english}</p><img id="image" src="" alt="word image">`;
+    back.innerHTML = `<p style="color: ${cardColor};"><strong>${word.german}</strong> = ${word.english}</p><img id="image" src="" alt="word image" style="display: none;">`;
 
     speak(frontText);
 
-    fetch(`https://api.pexels.com/v1/search?query=${word.english}&per_page=1`, {
+    // Safely fetch the image and hide it if it fails
+    const imgElement = document.getElementById("image");
+    imgElement.style.display = "none";
+    imgElement.src = "";
+
+    const searchQuery = encodeURIComponent(word.english);
+
+    fetch(`https://api.pexels.com/v1/search?query=${searchQuery}&per_page=1`, {
         headers: { Authorization: 'bXRrCdI0rYHuzI8RossKeXHIryc6Hupp2wVMEyuDFXOsyRJiB5c8BMlp' }
     })
         .then(response => response.json())
         .then(data => {
             if (data.photos && data.photos.length > 0) {
-                document.getElementById("image").src = data.photos[0].src.medium;
-            } else {
-                document.getElementById("image").alt = "No image found";
+                imgElement.src = data.photos[0].src.medium;
+                imgElement.style.display = "block";
             }
+        })
+        .catch(error => {
+            console.error("Image fetch failed:", error);
         });
 }
 
 function checkArticle(guess) {
-    // Grey out the clicked button
     const clickedBtn = document.getElementById(`btn-${guess}`);
     clickedBtn.style.backgroundColor = "#f0f0f0";
     clickedBtn.style.color = "#9e9e9e";
 
-    // Auto-flip the card
     flashcard.classList.add("flipped");
-
-    // ALWAYS reveal the Practice button so they can move forward
     btnPractice.style.visibility = "visible";
 
-    // THE RULE: If correct, reveal Learned. If wrong, keep it hidden!
     if (guess === currentArticle) {
         btnLearned.style.visibility = "visible";
     } else {
-        btnLearned.style.visibility = "hidden"; // Forces them to click Practice
+        btnLearned.style.visibility = "hidden";
     }
 
     const word = words[currentIndex];
@@ -242,6 +255,9 @@ function markAsLearned() {
         learnedWords.push(currentIndex);
         localStorage.setItem(currentGroup, JSON.stringify(learnedWords));
     }
+
+    updateProgress();
+
     currentIndex++;
     if (currentIndex >= words.length) currentIndex = 0;
     flashcard.classList.remove("flipped");
@@ -273,6 +289,7 @@ function undoLastAction() {
         undoButton.style.display = "none";
     }
 
+    updateProgress();
     flashcard.classList.remove("flipped");
     loadWord();
 }
@@ -284,6 +301,7 @@ function goHome() {
     title.style.display = "block";
     homeButton.style.display = "none";
     undoButton.style.display = "none";
+    progressCounter.style.display = "none";
 
     document.getElementById("tab-nav").style.display = "flex";
     showGroupButtons();
