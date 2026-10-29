@@ -17,6 +17,21 @@
             z-index: 1000;
         }
 
+        /* VERB MASTERY BUTTON FIXES: Forces text to stay on one line and spaces out the arrow */
+        .verb-menu-btn {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            width: 100% !important;
+            text-align: left !important;
+            padding: 15px 20px !important;
+        }
+
+        .verb-menu-btn span:first-child {
+            white-space: nowrap !important;
+            margin-right: 15px !important;
+        }
+
         /* MOBILE CSS: Fixes top clash and minimizes side spaces */
         @media (max-width: 600px) {
             body {
@@ -122,12 +137,11 @@
 
             </div>
 
-            <!-- Progress Counter (Moved to the very bottom, after all the buttons) -->
+            <!-- Progress Counter -->
             <div id="progress-counter"
                 style="display: none; text-align: center; font-weight: bold; color: #555; margin-bottom: 60px; font-size: 16px;">
                 0 / 0 Learned
             </div>
-
         </div>
 
         <!-- ===== GRAMMAR LAB ===== -->
@@ -140,6 +154,7 @@
                 </div>
                 <div class="grammar-topic-list" id="grammar-topic-list"></div>
             </div>
+
             <div id="grammar-module" style="display: none;">
                 <button class="grammar-back" onclick="closeGrammarModule()">← All grammar sections</button>
                 <div class="grammar-heading grammar-module-heading">
@@ -161,6 +176,74 @@
                 <article class="grammar-theory" id="grammar-theory"></article>
                 <section class="grammar-practice-panel" id="grammar-practice"></section>
             </div>
+
+            <!-- ===== VERB MASTERY UI ===== -->
+            <div id="verb-section-home" style="display: none;">
+                <button class="grammar-back" onclick="closeVerbMenu()">← All grammar sections</button>
+                <div class="grammar-heading">
+                    <p class="eyebrow">Verb Mastery</p>
+                    <h3>Choose a verb list</h3>
+                </div>
+
+                <h4 style="margin-top:20px; color:#555;">Perfect Form</h4>
+                <div class="grammar-topic-list">
+                    <button class="grammar-topic-card verb-menu-btn"
+                        onclick="startVerbFlashcards('perfectForms', 'mixed')"><span><strong>Mixed
+                                Verbs</strong></span><span class="topic-arrow">→</span></button>
+                    <button class="grammar-topic-card verb-menu-btn"
+                        onclick="startVerbFlashcards('perfectForms', 'a1')"><span><strong>A1 Irregular
+                                Verbs</strong></span><span class="topic-arrow">→</span></button>
+                    <button class="grammar-topic-card verb-menu-btn"
+                        onclick="startVerbFlashcards('perfectForms', 'a2')"><span><strong>A2 Irregular
+                                Verbs</strong></span><span class="topic-arrow">→</span></button>
+                    <button class="grammar-topic-card verb-menu-btn"
+                        onclick="startVerbFlashcards('perfectForms', 'b1')"><span><strong>B1 Irregular
+                                Verbs</strong></span><span class="topic-arrow">→</span></button>
+                    <button class="grammar-topic-card verb-menu-btn"
+                        onclick="startVerbFlashcards('perfectForms', 'b2')"><span><strong>B2 Irregular
+                                Verbs</strong></span><span class="topic-arrow">→</span></button>
+                </div>
+
+                <h4 style="margin-top:20px; color:#555;">Conjugation Shifts (du / er, sie, es)</h4>
+                <div class="grammar-topic-list">
+                    <button class="grammar-topic-card verb-menu-btn"
+                        onclick="startVerbFlashcards('conjugationForms', 'shift_a_to_ae')"><span><strong>Shift: a →
+                                ä</strong></span><span class="topic-arrow">→</span></button>
+                    <button class="grammar-topic-card verb-menu-btn"
+                        onclick="startVerbFlashcards('conjugationForms', 'shift_e_to_i')"><span><strong>Shift: e →
+                                i</strong></span><span class="topic-arrow">→</span></button>
+                    <button class="grammar-topic-card verb-menu-btn"
+                        onclick="startVerbFlashcards('conjugationForms', 'shift_e_to_ie')"><span><strong>Shift: e →
+                                ie</strong></span><span class="topic-arrow">→</span></button>
+                </div>
+            </div>
+
+            <div id="verb-flashcard-area" style="display: none;">
+                <button class="grammar-back" onclick="openVerbMenu()">← Verb Lists</button>
+
+                <div id="flashcard-container" style="margin-top: 20px;">
+                    <div class="flashcard" id="verb-card">
+                        <div class="front" id="verb-front">Verb</div>
+                        <div class="back" id="verb-back">Meaning / Form</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+                    <button id="verb-btn-flip" onclick="flipVerbCard()"
+                        style="padding: 8px 20px; border: 2px solid #555; border-radius: 6px; background-color: #f9f9f9; cursor: pointer; font-weight: bold;">Flip</button>
+                    <button id="verb-btn-next" onclick="nextVerbCard()"
+                        style="display: none; padding: 8px 20px; border: 2px solid #555; border-radius: 6px; background-color: #fff; cursor: pointer; font-weight: bold;">Next</button>
+                </div>
+
+                <!-- Bottom row: Back button & Progress -->
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; padding: 0 10px;">
+                    <button onclick="prevVerbCard()"
+                        style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer;">←
+                        Back</button>
+                    <div id="verb-progress" style="font-weight: bold; color: #555;">0 / 0</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -174,6 +257,7 @@
     <script src="extra-grammar.js?v=3"></script>
     <script src="grammar.js?v=20261001-4"></script>
     <script src="dative-game.js"></script>
+    <script src="verb.js"></script>
 </body>
 
 </html>

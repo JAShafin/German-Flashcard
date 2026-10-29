@@ -205,7 +205,7 @@ const grammarSections = [
             ["She cooks the soup without using salt.", "Sie kocht die Suppe, ohne Salz zu benutzen."],
             ["He speaks German without having an accent.", "Er spricht Deutsch, ohne einen Akzent zu haben."],
             ["We walked for hours without taking a break.", "Wir sind stundenlang gelaufen, ohne eine Pause zu machen."],
-            ["Instead of helping me, he is playing on his phone.", "Anstatt mir zu helfen, spielt er am Handy."],
+            ["Instead of helping me, he is playing on his phone.", "Anstatt mir zu helfen, spielt am Handy."],
             ["Instead of apologizing, he left.", "Anstatt sich zu entschuldigen, ist er gegangen."],
             ["Instead of eating vegetables, he eats chocolate.", "Anstatt Gemüse zu essen, isst er Schokolade."],
             ["I stay in bed instead of standing up.", "Ich bleibe im Bett, anstatt aufzustehen."],
@@ -259,9 +259,16 @@ function renderGrammarTopics() {
     const topics = document.getElementById("grammar-topic-list");
     if (!topics) return;
     const progress = loadGrammarProgress();
+
     topics.innerHTML = `<button class="grammar-topic-card" onclick="openGrammarModule('core')"><span class="topic-icon">§</span><span><strong>Subordinate Clause</strong><small></small></span><span class="topic-arrow">→</span></button>`;
+
     topics.innerHTML += allGrammarSections.slice(grammarSections.length).map(section => `<button class="grammar-topic-card" onclick="openGrammarModule('${section.id}')"><span class="topic-icon">§</span><span><strong>${section.title}</strong><small></small></span><span class="topic-arrow">→</span></button>`).join("");
+
+    // Original Dative Button
     topics.innerHTML += `<button class="grammar-topic-card" onclick="initDativeGame()" style="background:#e8f5e9; border-color:#81c784;"><span class="topic-icon" style="color:#2e7d32;">🎯</span><span><strong style="color:#2e7d32;">Dative Verb Mastery</strong></span><span class="topic-arrow">→</span></button>`;
+
+    // NEW: Verb Mastery Button
+    topics.innerHTML += `<button class="grammar-topic-card" onclick="openVerbMenu()" style="background:#fff3e0; border-color:#ffb74d;"><span class="topic-icon" style="color:#e65100;">🔥</span><span><strong style="color:#e65100;">Verb Mastery (Perfect & Conjugation)</strong></span><span class="topic-arrow">→</span></button>`;
 }
 
 function openGrammarModule(sectionId) {
