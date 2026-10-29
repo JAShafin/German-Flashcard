@@ -70,12 +70,15 @@ function showGroupButtons() {
         const total = wordGroups[group].length;
         const progress = learned.length;
 
-        let label = group;
+        // NEW: Always show the total word count next to the category name
+        let label = `${group} (${total})`;
+
+        // Add progress or checkmark if applicable
         if (progress === total && total > 0) {
             label += " ✅";
         } else if (progress > 0) {
             const percent = Math.floor((progress / total) * 100);
-            label += ` (${percent}%)`;
+            label += ` - ${percent}%`;
         }
 
         const button = document.createElement("button");
