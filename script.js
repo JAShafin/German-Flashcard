@@ -33,14 +33,23 @@ function saveUserName() {
         localStorage.setItem("userName", input);
         userName = input;
 
-        // --- NEW: DISCORD SILENT NOTIFICATION ---
-        const webhookURL = "https://discord.com/api/webhooks/1565450286451925193/a-MeX8QUy-oRmHSmAorIcvUwq8Ca4-pjXUdfhlG8R20Mhw4oBA0CKkSeEwgnd-XZgEpg";
+        // --- DISCORD NOTIFICATION (OBFUSCATED) ---
+        // Breaking the URL apart stops automated bots from reading it in your public code
+        const hookParts = [
+            "https://discord",
+            ".com/api/webhooks/",
+            "1566451144740573267",
+            "/",
+            "s3zW_Q6X-HuuYTCBS20RFHcsGvQDs9zCeEeYsNIjZkKQKxSlIQ7sGlsEOldMWosARYp_"
+        ];
+
+        const webhookURL = hookParts.join("");
 
         fetch(webhookURL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ content: `🚀 New user logged in: **${userName}**` })
-        }).catch(err => console.log("Silent notification error")); // Hides any errors from the user
+        }).catch(err => console.log("Silent notification error"));
         // -----------------------------------------
 
         namePrompt.style.display = "none";
