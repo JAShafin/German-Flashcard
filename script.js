@@ -26,6 +26,10 @@ let currentGroup = "";
 let currentArticle = "";
 let historyStack = [];
 
+// NEW: Track which deck we are in
+let currentDeckType = 'general';
+let filteredGoetheData = {}; // Will hold deduplicated Goethe lists
+
 // Save username & go to category screen
 function saveUserName() {
     const input = document.getElementById("userNameInput").value.trim();
@@ -34,7 +38,6 @@ function saveUserName() {
         userName = input;
 
         // --- DISCORD NOTIFICATION (OBFUSCATED) ---
-        // Breaking the URL apart stops automated bots from reading it in your public code
         const hookParts = [
             "https://discord",
             ".com/api/webhooks/",
@@ -42,9 +45,7 @@ function saveUserName() {
             "/",
             "s3zW_Q6X-HuuYTCBS20RFHcsGvQDs9zCeEeYsNIjZkKQKxSlIQ7sGlsEOldMWosARYp_"
         ];
-
         const webhookURL = hookParts.join("");
-
         fetch(webhookURL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -54,9 +55,11 @@ function saveUserName() {
 
         namePrompt.style.display = "none";
         title.style.display = "block";
-        groupButtons.style.display = "flex";
         document.getElementById("tab-nav").style.display = "flex";
-        showGroupButtons();
+
+        document.getElementById("deck-selection-home").style.display = "block";
+        document.getElementById("deck-groups-area").style.display = "none";
+
         if (typeof initializeGrammar === 'function') initializeGrammar();
     }
 }
@@ -67,32 +70,128 @@ window.onload = function () {
     flashcard.style.display = "none";
     if (interactionArea) interactionArea.style.display = "none";
 
+    // Safety fallback for Goethe lists
+    if (typeof goetheGroups === 'undefined') {
+        window.goetheGroups = {};
+    }
+
+    // Safety fallback for General words
+    if (typeof wordGroups === 'undefined') {
+        window.wordGroups = {};
+    }
+
+    // Build the Deduplicated Goethe Data once on load
+    buildFilteredGoetheData();
+
     if (userName) {
         namePrompt.style.display = "none";
         title.style.display = "block";
-        groupButtons.style.display = "flex";
         document.getElementById("tab-nav").style.display = "flex";
-        showGroupButtons();
+
+        document.getElementById("deck-selection-home").style.display = "block";
+        document.getElementById("deck-groups-area").style.display = "none";
+
         if (typeof initializeGrammar === 'function') initializeGrammar();
     } else {
         namePrompt.style.display = "block";
         title.style.display = "block";
-        groupButtons.style.display = "none";
+        document.getElementById("deck-selection-home").style.display = "none";
+        document.getElementById("deck-groups-area").style.display = "none";
     }
 };
 
-function showGroupButtons() {
+// --- AUTOMATIC DEDUPLICATION LOGIC ---
+function buildFilteredGoetheData() {
+    const seenWords = new Set();
+    filteredGoetheData = { A1: {}, A2: {}, B1: {}, B2: {} };
+
+    // Helper function to extract just the base German word (ignoring der/die/das)
+    function getBaseWord(fullString) {
+        if (!fullString) return "";
+        const parts = fullString.split(" ");
+        if (parts.length > 1 && ["der", "die", "das"].includes(parts[0].toLowerCase())) {
+            return parts.slice(1).join(" ").trim().toLowerCase();
+        }
+        return fullString.trim().toLowerCase();
+    }
+
+    // Process levels in order so higher levels strip out lower-level duplicates
+    const levels = ["A1", "A2", "B1", "B2"];
+
+    levels.forEach(level => {
+        if (goetheGroups[level]) {
+            Object.keys(goetheGroups[level]).forEach(listName => {
+                filteredGoetheData[level][listName] = goetheGroups[level][listName].filter(wordObj => {
+                    const base = getBaseWord(wordObj.german);
+                    // If we already saw this word in a lower level, remove it here
+                    if (seenWords.has(base)) return false;
+
+                    // Otherwise, add it to our seen list and keep it
+                    seenWords.add(base);
+                    return true;
+                });
+            });
+        }
+    });
+}
+// -------------------------------------
+
+
+// --- NEW DECK NAVIGATION ---
+function openDeck(type) {
+    currentDeckType = type;
+    document.getElementById("deck-selection-home").style.display = "none";
+
+    if (type === 'goethe') {
+        document.getElementById("goethe-sections-area").style.display = "block";
+        document.getElementById("deck-groups-area").style.display = "none";
+    } else {
+        document.getElementById("goethe-sections-area").style.display = "none";
+        document.getElementById("deck-groups-area").style.display = "block";
+        showGroupButtons(window.wordGroups); // Safely pass window object
+    }
+}
+
+function openGoetheSection(level) {
+    document.getElementById("goethe-sections-area").style.display = "none";
+    document.getElementById("deck-groups-area").style.display = "block";
+    showGroupButtons(filteredGoetheData[level]); // Show specific level
+}
+
+function closeDeck() {
+    if (currentDeckType === 'goethe' && document.getElementById("deck-groups-area").style.display === "block") {
+        // Back from lists to the 4 sections
+        document.getElementById("deck-groups-area").style.display = "none";
+        document.getElementById("goethe-sections-area").style.display = "block";
+    } else {
+        // Back to main home
+        document.getElementById("deck-groups-area").style.display = "none";
+        document.getElementById("goethe-sections-area").style.display = "none";
+        document.getElementById("deck-selection-home").style.display = "block";
+    }
+}
+// ---------------------------
+
+function showGroupButtons(dataSource) {
     groupButtons.innerHTML = "";
     groupButtons.style.display = "flex";
 
-    Object.keys(wordGroups).forEach(group => {
+    if (!dataSource || Object.keys(dataSource).length === 0) {
+        groupButtons.innerHTML = "<p>No lists available for this section yet.</p>";
+        return;
+    }
+
+    Object.keys(dataSource).forEach(group => {
+        // If a list was completely emptied by filtering, skip it
+        if (!dataSource[group] || dataSource[group].length === 0) return;
+
         const learned = JSON.parse(localStorage.getItem(group)) || [];
-        const total = wordGroups[group].length;
+        const total = dataSource[group].length;
         const progress = learned.length;
 
         let label = `${group} (${total})`;
 
-        if (progress === total && total > 0) {
+        if (progress >= total && total > 0) {
             label += " ✅";
         } else if (progress > 0) {
             const percent = Math.floor((progress / total) * 100);
@@ -101,7 +200,7 @@ function showGroupButtons() {
 
         const button = document.createElement("button");
         button.innerText = label;
-        button.onclick = () => startFlashcards(group);
+        button.onclick = () => startFlashcards(group, dataSource[group]);
 
         const resetButton = document.createElement("button");
         resetButton.innerHTML = "🔁";
@@ -114,7 +213,7 @@ function showGroupButtons() {
 
         resetButton.onclick = () => {
             localStorage.removeItem(group);
-            showGroupButtons();
+            showGroupButtons(dataSource); // Refresh
         };
 
         const wrapper = document.createElement("div");
@@ -137,8 +236,8 @@ function updateProgress() {
     }
 }
 
-function startFlashcards(selectedGroup) {
-    words = wordGroups[selectedGroup];
+function startFlashcards(selectedGroup, selectedWordsArray) {
+    words = selectedWordsArray;
     currentGroup = selectedGroup;
     currentIndex = 0;
     learnedWords = JSON.parse(localStorage.getItem(currentGroup)) || [];
@@ -147,9 +246,8 @@ function startFlashcards(selectedGroup) {
     flashcard.classList.remove("flipped");
     flashcard.style.display = "block";
 
-    // Show the interaction row
     interactionArea.style.display = "flex";
-    groupButtons.style.display = "none";
+    document.getElementById("deck-groups-area").style.display = "none";
     title.style.display = "none";
     homeButton.style.display = "block";
     undoButton.style.display = "none";
@@ -176,7 +274,6 @@ function loadWord() {
         if (currentIndex >= words.length) currentIndex = 0;
     }
 
-    // Reset UI for the new card
     btnDer.style.backgroundColor = "#fff"; btnDer.style.color = "#333";
     btnDie.style.backgroundColor = "#fff"; btnDie.style.color = "#333";
     btnDas.style.backgroundColor = "#fff"; btnDas.style.color = "#333";
@@ -188,7 +285,6 @@ function loadWord() {
 
     const parts = word.german.split(" ");
 
-    // Check if it's a noun with der/die/das
     if (parts.length > 1 && ["der", "die", "das"].includes(parts[0].toLowerCase())) {
         currentArticle = parts[0].toLowerCase();
         const noun = parts.slice(1).join(" ");
@@ -198,7 +294,6 @@ function loadWord() {
         else if (currentArticle === "die") cardColor = "#e91e63";
         else if (currentArticle === "das") cardColor = "#388e3c";
 
-        // Show Genders in middle, but HIDE Practice/Learned on the sides initially
         btnDer.style.display = "inline-block";
         btnDie.style.display = "inline-block";
         btnDas.style.display = "inline-block";
@@ -207,7 +302,6 @@ function loadWord() {
         btnPractice.style.visibility = "hidden";
         btnLearned.style.visibility = "hidden";
     } else {
-        // Not a noun - Hide genders, show Flip in middle, reveal side buttons
         btnDer.style.display = "none";
         btnDie.style.display = "none";
         btnDas.style.display = "none";
@@ -222,7 +316,6 @@ function loadWord() {
 
     speak(frontText);
 
-    // Safely fetch the image and hide it if it fails
     const imgElement = document.getElementById("image");
     imgElement.style.display = "none";
     imgElement.src = "";
@@ -325,7 +418,15 @@ function goHome() {
     progressCounter.style.display = "none";
 
     document.getElementById("tab-nav").style.display = "flex";
-    showGroupButtons();
+
+    // We determine where home actually is based on currentDeckType
+    if (currentDeckType === 'goethe') {
+        document.getElementById("deck-groups-area").style.display = "block";
+        showGroupButtons(filteredGoetheData[currentGroup.substring(0, 2)]);
+    } else {
+        document.getElementById("deck-groups-area").style.display = "block";
+        showGroupButtons(window.wordGroups);
+    }
 }
 
 function speak(text) {
@@ -353,6 +454,11 @@ function switchTab(tab) {
         grammarSection.style.display = "none";
         tabFlashcards.classList.add("active");
         tabGrammar.classList.remove("active");
+
+        // Reset to Deck Home when switching tabs
+        document.getElementById("deck-selection-home").style.display = "block";
+        document.getElementById("goethe-sections-area").style.display = "none";
+        document.getElementById("deck-groups-area").style.display = "none";
     } else {
         flashcardsSection.style.display = "none";
         grammarSection.style.display = "block";

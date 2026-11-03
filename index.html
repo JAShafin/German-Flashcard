@@ -93,11 +93,69 @@
 
         <!-- ===== FLASHCARDS TAB ===== -->
         <div id="flashcards-section">
-            <!-- Group Selection Buttons -->
-            <div id="group-buttons" style="display: none;"></div>
 
-            <!-- Credit -->
-            <p class="credit">Developed by Shaf 🤙</p>
+            <!-- Deck Selection Menu -->
+            <div id="deck-selection-home" style="display: none;">
+                <div class="grammar-heading">
+                    <p class="eyebrow">Flashcards</p>
+                    <h3>Choose a vocabulary deck</h3>
+                </div>
+                <div class="grammar-topic-list">
+                    <button class="grammar-topic-card" onclick="openDeck('general')">
+                        <span class="topic-icon">📚</span>
+                        <span><strong>General Vocabulary</strong><br><small style="color:#666;">Comprehensive word
+                                groups</small></span>
+                        <span class="topic-arrow">→</span>
+                    </button>
+                    <button class="grammar-topic-card" style="background:#e3f2fd; border-color:#64b5f6;"
+                        onclick="openDeck('goethe')">
+                        <span class="topic-icon" style="color:#1976d2;">🎓</span>
+                        <span><strong style="color:#1976d2;">Goethe Certification</strong><br><small
+                                style="color:#1976d2;">Official A1 - B2 exam words</small></span>
+                        <span class="topic-arrow">→</span>
+                    </button>
+                </div>
+                <!-- Credit -->
+                <p class="credit" style="margin-top: 40px;">Developed by Shaf 🤙</p>
+            </div>
+
+            <!-- NEW: Goethe Sections Area (A1, A2, B1, B2) -->
+            <div id="goethe-sections-area" style="display: none;">
+                <button class="grammar-back" onclick="closeDeck()" style="margin-bottom: 20px;">← Back to Decks</button>
+                <div class="grammar-heading">
+                    <p class="eyebrow">Goethe Certification</p>
+                    <h3>Choose a level</h3>
+                    <p>Gradual progression from A1 to B2 words for official exam preparation.</p>
+                </div>
+                <div class="grammar-topic-list">
+                    <button class="grammar-topic-card" onclick="openGoetheSection('A1')">
+                        <span class="topic-icon">🌱</span>
+                        <span><strong>A1 Beginner</strong></span>
+                        <span class="topic-arrow">→</span>
+                    </button>
+                    <button class="grammar-topic-card" onclick="openGoetheSection('A2')">
+                        <span class="topic-icon">🍀</span>
+                        <span><strong>A2 Elementary</strong></span>
+                        <span class="topic-arrow">→</span>
+                    </button>
+                    <button class="grammar-topic-card" onclick="openGoetheSection('B1')">
+                        <span class="topic-icon">🌿</span>
+                        <span><strong>B1 Intermediate</strong></span>
+                        <span class="topic-arrow">→</span>
+                    </button>
+                    <button class="grammar-topic-card" onclick="openGoetheSection('B2')">
+                        <span class="topic-icon">🌳</span>
+                        <span><strong>B2 Upper Intermediate</strong></span>
+                        <span class="topic-arrow">→</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Group Selection Area (The actual lists) -->
+            <div id="deck-groups-area" style="display: none;">
+                <button class="grammar-back" onclick="closeDeck()" style="margin-bottom: 20px;">← Back</button>
+                <div id="group-buttons" style="display: flex; flex-direction: column; align-items: center;"></div>
+            </div>
 
             <!-- Flashcard -->
             <div id="flashcard-container">
@@ -186,11 +244,9 @@
                 </div>
 
                 <h4 style="margin-top:20px; color:#555;">Perfect Form</h4>
-                <!-- Dynamic List Rendered by JS -->
                 <div id="verb-perfect-list"></div>
 
                 <h4 style="margin-top:20px; color:#555;">Conjugation Shifts (du / er, sie, es)</h4>
-                <!-- Dynamic List Rendered by JS -->
                 <div id="verb-conjugation-list"></div>
             </div>
 
@@ -232,6 +288,7 @@
 
     <!-- JavaScript -->
     <script src="words.js"></script>
+    <script src="goethe-words.js"></script>
     <script src="script.js?v=20261018-8"></script>
     <script src="extra-grammar.js?v=3"></script>
     <script src="grammar.js?v=20261001-4"></script>
