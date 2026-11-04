@@ -25,6 +25,8 @@ let learnedWords = [];
 let currentGroup = "";
 let currentArticle = "";
 let historyStack = [];
+let imageRequestId = 0;
+let imageRequestController = null;
 
 // NEW: Track which deck we are in
 let currentDeckType = 'general';
@@ -320,20 +322,39 @@ function loadWord() {
     imgElement.style.display = "none";
     imgElement.src = "";
 
-    const searchQuery = encodeURIComponent(word.english);
+    imageRequestId++;
+    const requestId = imageRequestId;
+    if (imageRequestController) imageRequestController.abort();
+    imageRequestController = new AbortController();
+
+    const imageCacheKey = `flashcard-image:${word.german}:${word.english}`;
+    const cachedImageUrl = sessionStorage.getItem(imageCacheKey);
+    if (cachedImageUrl) {
+        imgElement.src = cachedImageUrl;
+        imgElement.style.display = "block";
+        return;
+    }
+
+    const searchQuery = encodeURIComponent(`${word.german} ${word.english}`);
 
     fetch(`https://api.pexels.com/v1/search?query=${searchQuery}&per_page=1`, {
-        headers: { Authorization: 'bXRrCdI0rYHuzI8RossKeXHIryc6Hupp2wVMEyuDFXOsyRJiB5c8BMlp' }
+        headers: { Authorization: 'bXRrCdI0rYHuzI8RossKeXHIryc6Hupp2wVMEyuDFXOsyRJiB5c8BMlp' },
+        signal: imageRequestController.signal
     })
         .then(response => response.json())
         .then(data => {
+            if (requestId !== imageRequestId) return;
             if (data.photos && data.photos.length > 0) {
-                imgElement.src = data.photos[0].src.medium;
+                const imageUrl = data.photos[0].src.medium;
+                sessionStorage.setItem(imageCacheKey, imageUrl);
+                imgElement.src = imageUrl;
                 imgElement.style.display = "block";
             }
         })
         .catch(error => {
-            console.error("Image fetch failed:", error);
+            if (error.name !== "AbortError") {
+                console.error("Image fetch failed:", error);
+            }
         });
 }
 
