@@ -9,12 +9,12 @@
     <link rel="stylesheet" href="style.css?v=20261018-10" />
 
     <style>
-        /* Keep the Home button above the flashcard on every screen size. */
+        /* Preserve the original Home button position while reserving card space below it. */
         #home-button {
-            position: static !important;
-            display: block;
-            margin: 0 auto 15px;
-            z-index: auto;
+            position: fixed !important;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
         }
 
         /* VERB MASTERY BUTTON FIXES: Forces text to stay on one line and spaces out the arrow */
@@ -51,7 +51,7 @@
 
             #flashcard-container {
                 width: 100% !important;
-                margin: 25px 0 0 0 !important;
+                margin: 75px 0 0 0 !important;
                 padding: 0 !important;
             }
 
