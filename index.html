@@ -9,12 +9,12 @@
     <link rel="stylesheet" href="style.css?v=20261018-10" />
 
     <style>
-        /* Fixes the Home button clash: Makes it scroll away with the page instead of floating permanently */
+        /* Keep the Home button above the flashcard on every screen size. */
         #home-button {
-            position: absolute !important;
-            top: 15px;
-            left: 15px;
-            z-index: 1000;
+            position: static !important;
+            display: block;
+            margin: 0 auto 15px;
+            z-index: auto;
         }
 
         /* VERB MASTERY BUTTON FIXES: Forces text to stay on one line and spaces out the arrow */
