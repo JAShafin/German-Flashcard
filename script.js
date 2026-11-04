@@ -148,7 +148,7 @@ function openDeck(type) {
     } else {
         document.getElementById("goethe-sections-area").style.display = "none";
         document.getElementById("deck-groups-area").style.display = "block";
-        showGroupButtons(window.wordGroups); // Safely pass window object
+        showGroupButtons(wordGroups);
     }
 }
 
@@ -425,7 +425,7 @@ function goHome() {
         showGroupButtons(filteredGoetheData[currentGroup.substring(0, 2)]);
     } else {
         document.getElementById("deck-groups-area").style.display = "block";
-        showGroupButtons(window.wordGroups);
+        showGroupButtons(wordGroups);
     }
 }
 
