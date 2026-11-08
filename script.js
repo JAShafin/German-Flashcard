@@ -327,7 +327,7 @@ function loadWord() {
     if (imageRequestController) imageRequestController.abort();
     imageRequestController = new AbortController();
 
-    const imageCacheKey = `flashcard-image:${word.german}:${word.english}`;
+    const imageCacheKey = `flashcard-image:v2:${word.german}`;
     const cachedImageUrl = sessionStorage.getItem(imageCacheKey);
     if (cachedImageUrl) {
         imgElement.src = cachedImageUrl;
@@ -335,7 +335,7 @@ function loadWord() {
         return;
     }
 
-    const searchQuery = encodeURIComponent(`${word.german} ${word.english}`);
+    const searchQuery = encodeURIComponent(word.german);
 
     fetch(`https://api.pexels.com/v1/search?query=${searchQuery}&per_page=1`, {
         headers: { Authorization: 'bXRrCdI0rYHuzI8RossKeXHIryc6Hupp2wVMEyuDFXOsyRJiB5c8BMlp' },
