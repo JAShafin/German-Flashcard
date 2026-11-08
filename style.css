@@ -80,11 +80,46 @@ h2 {
     transform: rotateY(360deg);
 }
 
+.flashcard.gender-der .front,
+.flashcard.gender-der .back {
+    border-color: #1976d2;
+    background-color: #eaf3ff;
+}
+
+.flashcard.gender-die .front,
+.flashcard.gender-die .back {
+    border-color: #e91e63;
+    background-color: #fff0f6;
+}
+
+.flashcard.gender-das .front,
+.flashcard.gender-das .back {
+    border-color: #388e3c;
+    background-color: #edf8ef;
+}
+
 /* Back card text */
 #card-back p {
     margin: 10px 0 5px 0;
     font-size: 26px;
     font-weight: bold;
+}
+
+.gender-answer {
+    display: inline-block;
+    font-weight: 700;
+}
+
+.gender-answer.der {
+    color: #1976d2;
+}
+
+.gender-answer.die {
+    color: #e91e63;
+}
+
+.gender-answer.das {
+    color: #388e3c;
 }
 
 /* Image styling */

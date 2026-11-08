@@ -27,6 +27,9 @@ let currentArticle = "";
 let historyStack = [];
 let imageRequestId = 0;
 let imageRequestController = null;
+const imageSearchOverrides = {
+    "die Abfahrt": "train departure station platform"
+};
 
 // NEW: Track which deck we are in
 let currentDeckType = 'general';
@@ -279,10 +282,10 @@ function loadWord() {
     btnDer.style.backgroundColor = "#fff"; btnDer.style.color = "#333";
     btnDie.style.backgroundColor = "#fff"; btnDie.style.color = "#333";
     btnDas.style.backgroundColor = "#fff"; btnDas.style.color = "#333";
+    flashcard.classList.remove("gender-der", "gender-die", "gender-das");
 
     const word = words[currentIndex];
     let frontText = word.german;
-    let cardColor = "inherit";
     currentArticle = "";
 
     const parts = word.german.split(" ");
@@ -291,10 +294,6 @@ function loadWord() {
         currentArticle = parts[0].toLowerCase();
         const noun = parts.slice(1).join(" ");
         frontText = noun;
-
-        if (currentArticle === "der") cardColor = "#1976d2";
-        else if (currentArticle === "die") cardColor = "#e91e63";
-        else if (currentArticle === "das") cardColor = "#388e3c";
 
         btnDer.style.display = "inline-block";
         btnDie.style.display = "inline-block";
@@ -314,7 +313,10 @@ function loadWord() {
     }
 
     front.innerText = frontText;
-    back.innerHTML = `<p style="color: ${cardColor};"><strong>${word.german}</strong> = ${word.english}</p><img id="image" src="" alt="word image" style="display: none;">`;
+    const answerMarkup = currentArticle
+        ? `<p class="gender-answer ${currentArticle}">${word.german} = ${word.english}</p>`
+        : `<p><strong>${word.german}</strong> = ${word.english}</p>`;
+    back.innerHTML = `${answerMarkup}<img id="image" src="" alt="word image" style="display: none;">`;
 
     speak(frontText);
 
@@ -327,7 +329,8 @@ function loadWord() {
     if (imageRequestController) imageRequestController.abort();
     imageRequestController = new AbortController();
 
-    const imageCacheKey = `flashcard-image:v2:${word.german}`;
+    const searchTerm = imageSearchOverrides[word.german] || `${word.german} ${word.english}`;
+    const imageCacheKey = `flashcard-image:v4:${word.german}:${word.english}:${searchTerm}`;
     const cachedImageUrl = sessionStorage.getItem(imageCacheKey);
     if (cachedImageUrl) {
         imgElement.src = cachedImageUrl;
@@ -335,7 +338,7 @@ function loadWord() {
         return;
     }
 
-    const searchQuery = encodeURIComponent(word.german);
+    const searchQuery = encodeURIComponent(searchTerm);
 
     fetch(`https://api.pexels.com/v1/search?query=${searchQuery}&per_page=1`, {
         headers: { Authorization: 'bXRrCdI0rYHuzI8RossKeXHIryc6Hupp2wVMEyuDFXOsyRJiB5c8BMlp' },
@@ -364,6 +367,7 @@ function checkArticle(guess) {
     clickedBtn.style.color = "#9e9e9e";
 
     flashcard.classList.add("flipped");
+    if (currentArticle) flashcard.classList.add(`gender-${currentArticle}`);
     btnPractice.style.visibility = "visible";
 
     if (guess === currentArticle) {
