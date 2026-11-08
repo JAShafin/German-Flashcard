@@ -1,4 +1,52 @@
 let userName;
+const presenceHeartbeatMs = 5 * 60 * 1000;
+let presenceHeartbeatId;
+let presenceStarted = false;
+
+function getDiscordWebhookUrl() {
+    const hookParts = [
+        "https://discord",
+        ".com/api/webhooks/",
+        "1566451144740573267",
+        "/",
+        "s3zW_Q6X-HuuYTCBS20RFHcsGvQDs9zCeEeYsNIjZkKQKxSlIQ7sGlsEOldMWosARYp_"
+    ];
+    return hookParts.join("");
+}
+
+function notifyDiscordPresence(status, keepalive = false) {
+    if (!userName) return;
+
+    fetch(getDiscordWebhookUrl(), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            content: `${status} **${userName}**`
+        }),
+        keepalive
+    }).catch(error => {
+        console.warn("Discord presence notification failed:", error);
+    });
+}
+
+function startPresenceTracking(initialStatus = "🟢 Online:") {
+    if (!userName || presenceStarted) return;
+
+    presenceStarted = true;
+    notifyDiscordPresence(initialStatus, true);
+    presenceHeartbeatId = window.setInterval(() => {
+        notifyDiscordPresence("💓 Still online:", true);
+    }, presenceHeartbeatMs);
+}
+
+function stopPresenceTracking() {
+    if (!presenceStarted) return;
+
+    window.clearInterval(presenceHeartbeatId);
+    presenceStarted = false;
+    notifyDiscordPresence("⚪ Left the website:", true);
+}
+
 const namePrompt = document.getElementById("namePrompt");
 const groupButtons = document.getElementById("group-buttons");
 const flashcard = document.getElementById("flashcard");
@@ -43,21 +91,7 @@ function saveUserName() {
         localStorage.setItem("userName", input);
         userName = input;
 
-        // --- DISCORD NOTIFICATION (OBFUSCATED) ---
-        const hookParts = [
-            "https://discord",
-            ".com/api/webhooks/",
-            "1566451144740573267",
-            "/",
-            "s3zW_Q6X-HuuYTCBS20RFHcsGvQDs9zCeEeYsNIjZkKQKxSlIQ7sGlsEOldMWosARYp_"
-        ];
-        const webhookURL = hookParts.join("");
-        fetch(webhookURL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ content: `🚀 New user logged in: **${userName}**` })
-        }).catch(err => console.log("Silent notification error"));
-        // -----------------------------------------
+        startPresenceTracking("🚀 New user started using the website:");
 
         namePrompt.style.display = "none";
         title.style.display = "block";
@@ -90,6 +124,7 @@ window.onload = function () {
     buildFilteredGoetheData();
 
     if (userName) {
+        startPresenceTracking();
         namePrompt.style.display = "none";
         title.style.display = "block";
         document.getElementById("tab-nav").style.display = "flex";
@@ -105,6 +140,8 @@ window.onload = function () {
         document.getElementById("deck-groups-area").style.display = "none";
     }
 };
+
+window.addEventListener("pagehide", stopPresenceTracking);
 
 // --- AUTOMATIC DEDUPLICATION LOGIC ---
 function buildFilteredGoetheData() {
