@@ -314,7 +314,7 @@ function loadWord() {
 
     front.innerText = frontText;
     const answerMarkup = currentArticle
-        ? `<p class="gender-answer ${currentArticle}">${word.german} = ${word.english}</p>`
+        ? `<p class="gender-answer ${currentArticle}"><strong>${word.german}</strong> = ${word.english}</p>`
         : `<p><strong>${word.german}</strong> = ${word.english}</p>`;
     back.innerHTML = `${answerMarkup}<img id="image" src="" alt="word image" style="display: none;">`;
 
