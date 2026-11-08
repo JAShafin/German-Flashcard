@@ -122,6 +122,36 @@ h2 {
     color: #388e3c;
 }
 
+.article-retry-row {
+    display: flex;
+    flex-basis: 100%;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.article-retry-row button {
+    padding: 6px 12px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.article-retry-row button:nth-child(1) {
+    background-color: #1976d2;
+}
+
+.article-retry-row button:nth-child(2) {
+    background-color: #e91e63;
+}
+
+.article-retry-row button:nth-child(3) {
+    background-color: #388e3c;
+}
+
 /* Image styling */
 img {
     width: 95%;

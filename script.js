@@ -18,6 +18,7 @@ const btnPractice = document.getElementById("btn-practice");
 const btnFlip = document.getElementById("btn-flip");
 const btnLearned = document.getElementById("btn-learned");
 const progressCounter = document.getElementById("progress-counter");
+const articleRetryRow = document.getElementById("article-retry-row");
 
 let words = [];
 let currentIndex = 0;
@@ -283,6 +284,7 @@ function loadWord() {
     btnDie.style.backgroundColor = "#fff"; btnDie.style.color = "#333";
     btnDas.style.backgroundColor = "#fff"; btnDas.style.color = "#333";
     flashcard.classList.remove("gender-der", "gender-die", "gender-das");
+    articleRetryRow.style.display = "none";
 
     const word = words[currentIndex];
     let frontText = word.german;
@@ -372,12 +374,22 @@ function checkArticle(guess) {
 
     if (guess === currentArticle) {
         btnLearned.style.visibility = "visible";
+        btnPractice.style.visibility = "visible";
+        articleRetryRow.style.display = "none";
     } else {
         btnLearned.style.visibility = "hidden";
+        btnPractice.style.visibility = "hidden";
+        articleRetryRow.style.display = "flex";
     }
 
     const word = words[currentIndex];
     speak(`${word.german}. It means: ${word.english}`);
+}
+
+function retryArticle(guess) {
+    if (guess === currentArticle) {
+        nextWord();
+    }
 }
 
 function flipCard() {
