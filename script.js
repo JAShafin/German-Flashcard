@@ -3,47 +3,6 @@ const presenceHeartbeatMs = 5 * 60 * 1000;
 let presenceHeartbeatId;
 let presenceStarted = false;
 
-function isAndroidTv() {
-    return /Android TV|AndroidTV|SMART-TV|SmartTV|GoogleTV|BRAVIA|AFT[A-Z]/i.test(navigator.userAgent);
-}
-
-function enableTvMode() {
-    if (!isAndroidTv()) return;
-
-    document.body.classList.add("tv-mode");
-    document.addEventListener("keydown", handleTvNavigation);
-}
-
-function handleTvNavigation(event) {
-    if (!document.body.classList.contains("tv-mode")) return;
-    if (event.key !== "Enter" && event.key !== " ") {
-        if (!["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) return;
-
-        const buttons = [...document.querySelectorAll("button:not([disabled])")].filter(button => {
-            const styles = window.getComputedStyle(button);
-            return styles.display !== "none" && styles.visibility !== "hidden" && button.offsetParent !== null;
-        });
-        if (buttons.length === 0) return;
-
-        const currentIndex = buttons.indexOf(document.activeElement);
-        const direction = ["ArrowRight", "ArrowDown"].includes(event.key) ? 1 : -1;
-        const nextIndex = currentIndex < 0
-            ? (direction > 0 ? 0 : buttons.length - 1)
-            : (currentIndex + direction + buttons.length) % buttons.length;
-
-        event.preventDefault();
-        buttons[nextIndex].focus();
-        return;
-    }
-
-    if (document.activeElement && document.activeElement.tagName === "BUTTON") {
-        event.preventDefault();
-        document.activeElement.click();
-    }
-}
-
-enableTvMode();
-
 function getDiscordWebhookUrl() {
     const hookParts = [
         "https://discord",
