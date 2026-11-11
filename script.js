@@ -3,6 +3,47 @@ const presenceHeartbeatMs = 5 * 60 * 1000;
 let presenceHeartbeatId;
 let presenceStarted = false;
 
+function isAndroidTv() {
+    return /Android TV|AndroidTV|SMART-TV|SmartTV|GoogleTV|BRAVIA|AFT[A-Z]/i.test(navigator.userAgent);
+}
+
+function enableTvMode() {
+    if (!isAndroidTv()) return;
+
+    document.body.classList.add("tv-mode");
+    document.addEventListener("keydown", handleTvNavigation);
+}
+
+function handleTvNavigation(event) {
+    if (!document.body.classList.contains("tv-mode")) return;
+    if (event.key !== "Enter" && event.key !== " ") {
+        if (!["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) return;
+
+        const buttons = [...document.querySelectorAll("button:not([disabled])")].filter(button => {
+            const styles = window.getComputedStyle(button);
+            return styles.display !== "none" && styles.visibility !== "hidden" && button.offsetParent !== null;
+        });
+        if (buttons.length === 0) return;
+
+        const currentIndex = buttons.indexOf(document.activeElement);
+        const direction = ["ArrowRight", "ArrowDown"].includes(event.key) ? 1 : -1;
+        const nextIndex = currentIndex < 0
+            ? (direction > 0 ? 0 : buttons.length - 1)
+            : (currentIndex + direction + buttons.length) % buttons.length;
+
+        event.preventDefault();
+        buttons[nextIndex].focus();
+        return;
+    }
+
+    if (document.activeElement && document.activeElement.tagName === "BUTTON") {
+        event.preventDefault();
+        document.activeElement.click();
+    }
+}
+
+enableTvMode();
+
 function getDiscordWebhookUrl() {
     const hookParts = [
         "https://discord",
@@ -148,14 +189,11 @@ function buildFilteredGoetheData() {
     const seenWords = new Set();
     filteredGoetheData = { A1: {}, A2: {}, B1: {}, B2: {} };
 
-    // Helper function to extract just the base German word (ignoring der/die/das)
-    function getBaseWord(fullString) {
-        if (!fullString) return "";
-        const parts = fullString.split(" ");
-        if (parts.length > 1 && ["der", "die", "das"].includes(parts[0].toLowerCase())) {
-            return parts.slice(1).join(" ").trim().toLowerCase();
-        }
-        return fullString.trim().toLowerCase();
+    // Keep distinct articles/forms and meanings, while removing exact duplicates.
+    function getWordKey(wordObj) {
+        const german = (wordObj.german || "").trim().toLowerCase();
+        const english = (wordObj.english || "").trim().toLowerCase().replace(/\s+/g, " ");
+        return `${german}|${english}`;
     }
 
     // Process levels in order so higher levels strip out lower-level duplicates
@@ -165,12 +203,12 @@ function buildFilteredGoetheData() {
         if (goetheGroups[level]) {
             Object.keys(goetheGroups[level]).forEach(listName => {
                 filteredGoetheData[level][listName] = goetheGroups[level][listName].filter(wordObj => {
-                    const base = getBaseWord(wordObj.german);
-                    // If we already saw this word in a lower level, remove it here
-                    if (seenWords.has(base)) return false;
+                    const wordKey = getWordKey(wordObj);
+                    // If the same word and meaning appeared at a lower level, remove it here
+                    if (seenWords.has(wordKey)) return false;
 
                     // Otherwise, add it to our seen list and keep it
-                    seenWords.add(base);
+                    seenWords.add(wordKey);
                     return true;
                 });
             });
